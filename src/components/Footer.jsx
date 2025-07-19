@@ -29,7 +29,7 @@ import {
     FaPhone,
     FaEnvelope,
     FaMapMarkerAlt,
-    FaLinkedin,
+    FaTiktok,
     FaTwitter,
     FaInstagram,
     FaWhatsapp,
@@ -116,7 +116,7 @@ const ContactFooter = ({contactRef}) => {
     ];
 
     const socialMedia = [
-        { icon: FaLinkedin, url: '#', color: '#0077B5' },
+        { icon: FaTiktok, url: '#', color: '#7b499cff' },
         { icon: FaInstagram, url: '#', color: '#E4405F' },
         { icon: FaTwitter, url: '#', color: '#1DA1F2' }
     ];
