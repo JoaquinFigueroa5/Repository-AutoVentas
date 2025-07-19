@@ -24,6 +24,7 @@ import {
     ModalCloseButton,
     useDisclosure
 } from '@chakra-ui/react';
+import { Link as LinkRouter } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     FaPhone,
@@ -42,7 +43,7 @@ const MotionBox = motion(Box);
 const MotionButton = motion(Button);
 const MotionIconButton = motion(IconButton);
 
-const ContactFooter = ({contactRef}) => {
+const ContactFooter = ({ contactRef }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -223,77 +224,7 @@ const ContactFooter = ({contactRef}) => {
                                         ))}
                                     </VStack>
 
-                                    {/* Mapa Interactivo */}
-                                    <MotionBox
-                                        initial={{ y: 20, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        transition={{ duration: 0.6, delay: 0.7 }}
-                                        w="full"
-                                        mt={6}
-                                    >
-                                        <Text fontSize="sm" color="gray.400" fontWeight="medium" mb={3}>
-                                            Nuestra Ubicación
-                                        </Text>
-                                        <Box
-                                            position="relative"
-                                            borderRadius="xl"
-                                            overflow="hidden"
-                                            bg="gray.800"
-                                            border="1px solid"
-                                            borderColor="gray.700"
-                                            _hover={{ borderColor: 'red.500' }}
-                                            transition="border-color 0.3s"
-                                        >
-                                            <iframe
-                                                src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3860.095923165555!2d-90.432344!3d14.650496!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTTCsDM5JzAxLjgiTiA5MMKwMjUnNTYuNCJX!5e0!3m2!1ses-419!2sgt!4v1752552726146!5m2!1ses-419!2sgt"
-                                                width="100%"
-                                                height="250"
-                                                style={{ border: 0 }}
-                                                allowFullScreen=""
-                                                loading="lazy"
-                                                referrerPolicy="no-referrer-when-downgrade"
-                                            />
-                                            <Box
-                                                position="absolute"
-                                                top="0"
-                                                left="0"
-                                                right="0"
-                                                bottom="0"
-                                                bg="blackAlpha.200"
-                                                opacity="0"
-                                                _hover={{ opacity: 1 }}
-                                                transition="opacity 0.3s"
-                                                display="flex"
-                                                alignItems="center"
-                                                justifyContent="center"
-                                            >
-                                                <HStack spacing={3}>
-                                                    <Button
-                                                        bg="red.500"
-                                                        color="white"
-                                                        _hover={{ bg: 'red.600' }}
-                                                        leftIcon={<FaMapMarkerAlt />}
-                                                        size="sm"
-                                                        borderRadius="full"
-                                                        onClick={() => window.open('https://maps.app.goo.gl/3kGDkxvDiMKwNQ8P6', '_blank')}
-                                                    >
-                                                        Google Maps
-                                                    </Button>
-                                                    <Button
-                                                        bg="blue.500"
-                                                        color="white"
-                                                        _hover={{ bg: 'blue.600' }}
-                                                        leftIcon={<FaMapMarkerAlt />}
-                                                        size="sm"
-                                                        borderRadius="full"
-                                                        onClick={() => window.open('https://ul.waze.com/ul?ll=14.65056545%2C-90.43240428&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location', '_blank')}
-                                                    >
-                                                        Waze
-                                                    </Button>
-                                                </HStack>
-                                            </Box>
-                                        </Box>
-                                    </MotionBox>
+
 
                                     <HStack spacing={4} pt={4}>
                                         {socialMedia.map((social, index) => (
@@ -315,7 +246,9 @@ const ContactFooter = ({contactRef}) => {
                                         ))}
                                     </HStack>
                                 </VStack>
+
                             </MotionBox>
+
                         </GridItem>
 
                         {/* Sección de Acción Rápida */}
@@ -390,10 +323,83 @@ const ContactFooter = ({contactRef}) => {
                                 </VStack>
                             </MotionBox>
                         </GridItem>
+
                     </Grid>
+                    {/* Mapa Interactivo */}
+                    <MotionBox
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.7 }}
+                        w="full"
+                        mt={6}
+                    >
+                        <Text fontSize="sm" color="gray.400" fontWeight="medium" mb={3}>
+                            Nuestra Ubicación
+                        </Text>
+                        <Box
+                            position="relative"
+                            borderRadius="xl"
+                            overflow="hidden"
+                            bg="gray.800"
+                            border="1px solid"
+                            borderColor="gray.700"
+                            _hover={{ borderColor: 'red.500' }}
+                            transition="border-color 0.3s"
+                        >
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3860.095923165555!2d-90.432344!3d14.650496!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTTCsDM5JzAxLjgiTiA5MMKwMjUnNTYuNCJX!5e0!3m2!1ses-419!2sgt!4v1752552726146!5m2!1ses-419!2sgt"
+                                width="100%"
+                                height="500"
+                                style={{ border: 0 }}
+                                allowFullScreen=""
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            />
+                            <Box
+                                position="absolute"
+                                top="0"
+                                left="0"
+                                right="0"
+                                bottom="0"
+                                bg="blackAlpha.200"
+                                opacity="0"
+                                _hover={{ opacity: 1 }}
+                                transition="opacity 0.3s"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                            >
+                                <HStack spacing={3}>
+                                    <Button
+                                        bg="red.500"
+                                        color="white"
+                                        _hover={{ bg: 'red.600' }}
+                                        leftIcon={<FaMapMarkerAlt />}
+                                        size="sm"
+                                        borderRadius="full"
+                                        onClick={() => window.open('https://maps.app.goo.gl/3kGDkxvDiMKwNQ8P6', '_blank')}
+                                    >
+                                        Google Maps
+                                    </Button>
+                                    <Button
+                                        bg="blue.500"
+                                        color="white"
+                                        _hover={{ bg: 'blue.600' }}
+                                        leftIcon={<FaMapMarkerAlt />}
+                                        size="sm"
+                                        borderRadius="full"
+                                        onClick={() => window.open('https://ul.waze.com/ul?ll=14.65056545%2C-90.43240428&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location', '_blank')}
+                                    >
+                                        Waze
+                                    </Button>
+                                </HStack>
+                            </Box>
+                        </Box>
+                    </MotionBox>
 
                     {/* Footer Bottom */}
                     <Divider borderColor="gray.700" mb={8} />
+
                     <MotionBox
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
@@ -413,6 +419,9 @@ const ContactFooter = ({contactRef}) => {
                                 <Link href="#" color="gray.400" fontSize="sm" _hover={{ color: 'white' }}>
                                     Cookies
                                 </Link>
+                                <LinkRouter to='/auth' color="gray.400" fontSize="sm" _hover={{ color: 'white' }}>
+                                    Iniciar Sesion
+                                </LinkRouter>
                             </HStack>
                         </HStack>
                     </MotionBox>

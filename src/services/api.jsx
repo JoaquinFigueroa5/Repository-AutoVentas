@@ -28,7 +28,7 @@ apiClient.interceptors.request.use(
 export const login = async(data) => {
     try {
         return await apiClient.post('/auth/login', data)
-    } catch (e) {
+    } catch (e) {        
         const msg = e.response?.data?.msg || 'Error desconocido';
         return {
             error: true,
@@ -45,8 +45,19 @@ export const getVehicles = async() => {
         const msg = error.response?.data?.msg || 'Error'
         return {
             error: true,
-            msg,
-            error
+            msg
+        }
+    }
+}
+
+export const addVehicles = async(data) => {
+    try {
+        return await apiClient.post('/vehicles/addVehicle')
+    } catch (error) {
+        const msg = error.response?.data?.msg || error.response?.data || 'Error'
+        return {
+            error: true,
+            msg
         }
     }
 }

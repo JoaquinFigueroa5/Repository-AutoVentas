@@ -55,7 +55,7 @@ export default function Carrousel() {
     const imageHeight = useBreakpointValue({ base: "180px", md: "220px", lg: "250px" });
     const modalSize = useBreakpointValue({ base: "full", md: "4xl", lg: "6xl" });
     const gridColumns = useBreakpointValue({
-        base: "repeat(1, 1fr)",
+        base: "repeat(2, 1fr)",
         md: "repeat(2, 1fr)",
         lg: "repeat(auto-fit, minmax(300px, 1fr))"
     });
@@ -142,7 +142,7 @@ export default function Carrousel() {
                             <Text as="span" color="whiteAlpha.900">Gratis!</Text>
                         </Heading>
                         <Text color="gray.400" textAlign="center" fontSize={textSize} mt={2}>
-                            Descubre nuestra colección variada de carros.
+                            Descubre nuestros vehículos disponibles para entrega inmediata.
                         </Text>
                         <Text color="gray.400" textAlign="center" fontSize={textSize} mt={2}>
                             Más de 95 vehículos disponibles para entrega inmediata!!!
