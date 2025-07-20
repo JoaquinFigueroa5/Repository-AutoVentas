@@ -28,7 +28,7 @@ import {
     WrapItem,
     Skeleton
 } from '@chakra-ui/react';
-import { ChevronLeft, ChevronRight, Eye, Heart, Calendar, Gauge, Fuel, Users, Phone, Mail, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Heart, Calendar, Gauge, Fuel, Phone, Mail, MapPin, Maximize2, ZoomIn, ZoomOut, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useVehicles from '../shared/hooks/useVehicles';
 
@@ -41,8 +41,14 @@ export default function Carrousel() {
     const [selectedCar, setSelectedCar] = useState(null);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [loadedImages, setLoadedImages] = useState({});
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [zoomLevel, setZoomLevel] = useState(1);
+    const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
+
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { vehicles, fetchVehicles, loading } = useVehicles();
+    const { vehicles, fetchVehiclesRecents, loading } = useVehicles();
 
     // Responsive values
     const containerMaxW = useBreakpointValue({ base: "100%", md: "7xl" });
@@ -55,13 +61,13 @@ export default function Carrousel() {
     const imageHeight = useBreakpointValue({ base: "180px", md: "220px", lg: "250px" });
     const modalSize = useBreakpointValue({ base: "full", md: "4xl", lg: "6xl" });
     const gridColumns = useBreakpointValue({
-        base: "repeat(2, 1fr)",
+        base: "repeat(1, 1fr)",
         md: "repeat(2, 1fr)",
         lg: "repeat(auto-fit, minmax(300px, 1fr))"
     });
 
     useEffect(() => {
-        fetchVehicles();
+        fetchVehiclesRecents();
     }, [])
 
     useEffect(() => {
@@ -99,6 +105,111 @@ export default function Carrousel() {
     const handleImageLoad = (index) => {
         setLoadedImages((prev) => ({ ...prev, [index]: true }));
     };
+
+    // Funciones de navegación
+    const goToPrevImage = () => {
+        if (selectedCar?.images?.length > 0) {
+            setSelectedImageIndex(prev =>
+                prev === 0 ? selectedCar.images.length - 1 : prev - 1
+            );
+            resetZoomAndPan();
+        }
+    };
+
+    const goToNextImage = () => {
+        if (selectedCar?.images?.length > 0) {
+            setSelectedImageIndex(prev =>
+                prev === selectedCar.images.length - 1 ? 0 : prev + 1
+            );
+            resetZoomAndPan();
+        }
+    };
+
+    // Funciones de zoom
+    const zoomIn = () => {
+        setZoomLevel(prev => Math.min(prev * 1.2, 3));
+    };
+
+    const zoomOut = () => {
+        setZoomLevel(prev => Math.max(prev / 1.2, 0.5));
+    };
+
+    const resetZoomAndPan = () => {
+        setZoomLevel(1);
+        setPanPosition({ x: 0, y: 0 });
+    };
+
+    // Funciones de pan (arrastrar)
+    const handleMouseDown = (e) => {
+        if (zoomLevel > 1) {
+            setIsDragging(true);
+            setLastMousePosition({ x: e.clientX, y: e.clientY });
+        }
+    };
+
+    const handleMouseMove = (e) => {
+        if (isDragging && zoomLevel > 1) {
+            const deltaX = e.clientX - lastMousePosition.x;
+            const deltaY = e.clientY - lastMousePosition.y;
+
+            setPanPosition(prev => ({
+                x: prev.x + deltaX,
+                y: prev.y + deltaY
+            }));
+
+            setLastMousePosition({ x: e.clientX, y: e.clientY });
+        }
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    // Función para abrir fullscreen
+    const openFullscreen = () => {
+        setIsFullscreen(true);
+        resetZoomAndPan();
+    };
+
+    // Función para cerrar fullscreen
+    const closeFullscreen = () => {
+        setIsFullscreen(false);
+        resetZoomAndPan();
+    };
+
+    // Manejo de teclas
+    const handleKeyDown = (e) => {
+        if (!isFullscreen) return;
+
+        switch (e.key) {
+            case 'Escape':
+                closeFullscreen();
+                break;
+            case 'ArrowLeft':
+                goToPrevImage();
+                break;
+            case 'ArrowRight':
+                goToNextImage();
+                break;
+            case '+':
+            case '=':
+                zoomIn();
+                break;
+            case '-':
+                zoomOut();
+                break;
+            case '0':
+                resetZoomAndPan();
+                break;
+        }
+    };
+
+    useEffect(() => {
+        if (isFullscreen) {
+            document.addEventListener('keydown', handleKeyDown);
+            return () => document.removeEventListener('keydown', handleKeyDown);
+        }
+    }, [isFullscreen]);
 
     const openModal = (car) => {
         setSelectedCar(car);
@@ -478,7 +589,7 @@ export default function Carrousel() {
                     ))}
                 </Grid>
 
-                {/* Modal */}
+                {/* Modal Principal */}
                 <Modal isOpen={isOpen} onClose={onClose} size={modalSize}>
                     <ModalOverlay bg="rgba(0,0,0,0.8)" />
                     <ModalContent
@@ -504,15 +615,82 @@ export default function Carrousel() {
                             >
                                 {/* Imagen principal y miniaturas */}
                                 <GridItem>
-                                    <Image
-                                        src={selectedCar?.images[selectedImageIndex]?.url}
-                                        alt={selectedCar?.name}
-                                        w="100%"
-                                        h={{ base: "250px", md: "300px" }}
-                                        objectFit="cover"
-                                        borderRadius="lg"
-                                        mb={4}
-                                    />
+                                    <Box position="relative" mb={4}>
+                                        <Image
+                                            src={selectedCar?.images[selectedImageIndex]?.url}
+                                            alt={selectedCar?.name}
+                                            w="100%"
+                                            h={{ base: "250px", md: "300px" }}
+                                            objectFit="cover"
+                                            borderRadius="lg"
+                                        />
+
+                                        {/* Botón de maximizar en esquina inferior derecha */}
+                                        <IconButton
+                                            icon={<Maximize2 size={16} />}
+                                            aria-label="Maximizar imagen"
+                                            position="absolute"
+                                            bottom={2}
+                                            right={2}
+                                            size="sm"
+                                            bg="rgba(0,0,0,0.7)"
+                                            color="white"
+                                            _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                            borderRadius="md"
+                                            onClick={openFullscreen}
+                                        />
+
+                                        {/* Navegación en imagen principal (solo si hay múltiples imágenes) */}
+                                        {selectedCar?.images?.length > 1 && (
+                                            <>
+                                                <IconButton
+                                                    icon={<ChevronLeft size={20} />}
+                                                    aria-label="Imagen anterior"
+                                                    position="absolute"
+                                                    left={2}
+                                                    top="50%"
+                                                    transform="translateY(-50%)"
+                                                    size="sm"
+                                                    bg="rgba(0,0,0,0.7)"
+                                                    color="white"
+                                                    _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                                    borderRadius="full"
+                                                    onClick={goToPrevImage}
+                                                />
+                                                <IconButton
+                                                    icon={<ChevronRight size={20} />}
+                                                    aria-label="Imagen siguiente"
+                                                    position="absolute"
+                                                    right={2}
+                                                    top="50%"
+                                                    transform="translateY(-50%)"
+                                                    size="sm"
+                                                    bg="rgba(0,0,0,0.7)"
+                                                    color="white"
+                                                    _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                                    borderRadius="full"
+                                                    onClick={goToNextImage}
+                                                />
+                                            </>
+                                        )}
+
+                                        {/* Contador de imágenes */}
+                                        {selectedCar?.images?.length > 1 && (
+                                            <Box
+                                                position="absolute"
+                                                bottom={2}
+                                                left={2}
+                                                bg="rgba(0,0,0,0.7)"
+                                                color="white"
+                                                px={2}
+                                                py={1}
+                                                borderRadius="md"
+                                                fontSize="xs"
+                                            >
+                                                {selectedImageIndex + 1} / {selectedCar.images.length}
+                                            </Box>
+                                        )}
+                                    </Box>
 
                                     {/* Galería responsiva */}
                                     <Box
@@ -544,7 +722,6 @@ export default function Carrousel() {
                                                                     top="0"
                                                                     left="0"
                                                                 />
-
                                                             )}
                                                             <Image
                                                                 src={img.url}
@@ -661,6 +838,169 @@ export default function Carrousel() {
                                 </Button>
                             </Stack>
                         </ModalFooter>
+                    </ModalContent>
+                </Modal>
+
+                {/* Modal Fullscreen para zoom e imágenes */}
+                <Modal isOpen={isFullscreen} onClose={closeFullscreen} size="full">
+                    <ModalOverlay bg="rgba(0,0,0,0.95)" />
+                    <ModalContent bg="transparent" boxShadow="none">
+                        <Box
+                            position="relative"
+                            w="100vw"
+                            h="100vh"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            overflow="hidden"
+                        >
+                            {/* Imagen con zoom */}
+                            <Box
+                                w="100%"
+                                h="100%"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                cursor={zoomLevel > 1 ? (isDragging ? "grabbing" : "grab") : "default"}
+                                onMouseDown={handleMouseDown}
+                                onMouseMove={handleMouseMove}
+                                onMouseUp={handleMouseUp}
+                                onMouseLeave={handleMouseUp}
+                            >
+                                <Image
+                                    src={selectedCar?.images[selectedImageIndex]?.url}
+                                    alt={selectedCar?.name}
+                                    maxW="90%"
+                                    maxH="90%"
+                                    objectFit="contain"
+                                    transform={`scale(${zoomLevel}) translate(${panPosition.x}px, ${panPosition.y}px)`}
+                                    transition={isDragging ? "none" : "transform 0.2s ease"}
+                                    userSelect="none"
+                                    pointerEvents={zoomLevel > 1 ? "auto" : "none"}
+                                />
+                            </Box>
+
+                            {/* Controles de zoom */}
+                            <VStack
+                                position="absolute"
+                                right={4}
+                                top="50%"
+                                transform="translateY(-50%)"
+                                spacing={2}
+                                bg="rgba(0,0,0,0.7)"
+                                borderRadius="md"
+                                p={2}
+                            >
+                                <IconButton
+                                    icon={<ZoomIn size={16} />}
+                                    aria-label="Zoom in"
+                                    size="sm"
+                                    bg="transparent"
+                                    color="white"
+                                    _hover={{ bg: "rgba(255,255,255,0.2)" }}
+                                    onClick={zoomIn}
+                                    isDisabled={zoomLevel >= 3}
+                                />
+                                <Text color="white" fontSize="xs" textAlign="center">
+                                    {Math.round(zoomLevel * 100)}%
+                                </Text>
+                                <IconButton
+                                    icon={<ZoomOut size={16} />}
+                                    aria-label="Zoom out"
+                                    size="sm"
+                                    bg="transparent"
+                                    color="white"
+                                    _hover={{ bg: "rgba(255,255,255,0.2)" }}
+                                    onClick={zoomOut}
+                                    isDisabled={zoomLevel <= 0.5}
+                                />
+                            </VStack>
+
+                            {/* Navegación entre imágenes */}
+                            {selectedCar?.images?.length > 1 && (
+                                <>
+                                    <IconButton
+                                        icon={<ChevronLeft size={32} />}
+                                        aria-label="Imagen anterior"
+                                        position="absolute"
+                                        left={4}
+                                        top="50%"
+                                        transform="translateY(-50%)"
+                                        size="lg"
+                                        bg="rgba(0,0,0,0.7)"
+                                        color="white"
+                                        _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                        borderRadius="full"
+                                        onClick={goToPrevImage}
+                                    />
+                                    <IconButton
+                                        icon={<ChevronRight size={32} />}
+                                        aria-label="Imagen siguiente"
+                                        position="absolute"
+                                        right={20}
+                                        top="50%"
+                                        transform="translateY(-50%)"
+                                        size="lg"
+                                        bg="rgba(0,0,0,0.7)"
+                                        color="white"
+                                        _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                        borderRadius="full"
+                                        onClick={goToNextImage}
+                                    />
+                                </>
+                            )}
+
+                            {/* Botón de cerrar */}
+                            <IconButton
+                                icon={<X size={24} />}
+                                aria-label="Cerrar"
+                                position="absolute"
+                                top={4}
+                                right={4}
+                                size="lg"
+                                bg="rgba(0,0,0,0.7)"
+                                color="white"
+                                _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                borderRadius="full"
+                                onClick={closeFullscreen}
+                            />
+
+                            {/* Información de la imagen */}
+                            <Box
+                                position="absolute"
+                                bottom={4}
+                                left={4}
+                                bg="rgba(0,0,0,0.7)"
+                                color="white"
+                                px={4}
+                                py={2}
+                                borderRadius="md"
+                            >
+                                <Text fontSize="sm" fontWeight="bold">
+                                    {selectedCar?.name}
+                                </Text>
+                                {selectedCar?.images?.length > 1 && (
+                                    <Text fontSize="xs" color="gray.300">
+                                        Imagen {selectedImageIndex + 1} de {selectedCar.images.length}
+                                    </Text>
+                                )}
+                            </Box>
+
+                            {/* Instrucciones de uso */}
+                            <Box
+                                position="absolute"
+                                top={4}
+                                left={4}
+                                bg="rgba(0,0,0,0.7)"
+                                color="white"
+                                px={3}
+                                py={2}
+                                borderRadius="md"
+                                fontSize="xs"
+                            >
+                                <Text>ESC: Salir • ←→: Navegar • +/-: Zoom • Arrastrar para mover</Text>
+                            </Box>
+                        </Box>
                     </ModalContent>
                 </Modal>
             </Container>

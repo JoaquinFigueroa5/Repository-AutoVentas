@@ -1,554 +1,1253 @@
 import React, { useState, useEffect } from 'react';
 import {
     Box,
-    Container,
-    Heading,
-    Text,
-    Button,
-    HStack,
-    VStack,
-    Badge,
-    IconButton,
     Grid,
     GridItem,
     Flex,
-    Divider,
-    useBreakpointValue,
-    Stack,
+    Text,
+    VStack,
+    HStack,
+    Card,
+    CardBody,
+    CardHeader,
     Stat,
     StatLabel,
     StatNumber,
-    StatHelpText,
-    StatArrow,
-    Table,
-    Thead,
-    Tbody,
-    Tr,
-    Th,
-    Td,
-    TableContainer,
-    Input,
-    InputGroup,
-    InputLeftElement,
-    Select,
-    Avatar,
-    AvatarBadge,
     Progress,
-    SimpleGrid,
-    Card,
-    CardBody,
-    CardHeader
+    Button,
+    IconButton,
+    Divider,
+    useBreakpointValue,
+    Circle,
+    Modal,
+    ModalBody,
+    ModalFooter,
+    useDisclosure,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    Heading,
+    ModalCloseButton,
+    Wrap,
+    Stack,
+    Image,
+    WrapItem,
+    Skeleton,
+    Drawer,
+    DrawerOverlay,
+    DrawerContent,
+    DrawerCloseButton,
+    DrawerHeader,
+    DrawerBody
 } from '@chakra-ui/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Car,
-    TrendingUp,
-    DollarSign,
     Users,
-    Eye,
-    Search,
-    Filter,
-    Plus,
-    Settings,
-    BarChart3,
-    PieChart,
     Calendar,
-    Bell,
-    LogOut,
-    Menu,
-    X
+    MoreVertical,
+    Plus,
+    Filter,
+    LogOutIcon,
+    Gauge,
+    Fuel,
+    Phone,
+    Mail,
+    MapPin,
+    Heart,
+    Maximize2,
+    ChevronLeft,
+    ChevronRight,
+    ZoomIn,
+    ZoomOut,
+    X,
+    MenuIcon
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { logout } from '../shared/hooks/useLogout';
+import useVehicles from '../shared/hooks/useVehicles';
 import useUserStore from '../context/UserStore';
+import { logout } from '../shared/hooks/useLogout';
 
 const MotionBox = motion(Box);
-const MotionButton = motion(Button);
-const MotionGrid = motion(Grid);
+const MotionCard = motion(Card);
+const MotionFlex = motion(Flex);
 
-// Mock data
-const mockData = {
-    stats: {
-        totalVehicles: 127,
-        soldThisMonth: 23,
-        revenue: 2850000,
-        activeUsers: 1843
-    },
-    recentSales: [
-        { id: 1, vehicle: 'Toyota Camry 2023', buyer: 'Carlos Mendez', price: 285000, date: '2025-01-15', status: 'completed' },
-        { id: 2, vehicle: 'Honda Accord 2022', buyer: 'Maria Rodriguez', price: 275000, date: '2025-01-14', status: 'pending' },
-        { id: 3, vehicle: 'Ford Mustang 2024', buyer: 'Juan Perez', price: 450000, date: '2025-01-13', status: 'completed' },
-        { id: 4, vehicle: 'BMW X5 2023', buyer: 'Ana Garcia', price: 650000, date: '2025-01-12', status: 'completed' },
-        { id: 5, vehicle: 'Audi A4 2022', buyer: 'Luis Morales', price: 380000, date: '2025-01-11', status: 'pending' }
-    ],
-    topVehicles: [
-        { model: 'Toyota Camry', sales: 15, percentage: 85 },
-        { model: 'Honda Accord', sales: 12, percentage: 70 },
-        { model: 'Ford Mustang', sales: 8, percentage: 55 },
-        { model: 'BMW X5', sales: 6, percentage: 40 }
-    ]
-};
+const AutoSalesDashboard = () => {
+    const [selectedCar, setSelectedCar] = useState(null);
+    const [favorites, setFavorites] = useState(new Set());
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [loadedImages, setLoadedImages] = useState({});
+    const [hoveredCard, setHoveredCard] = useState(null);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [zoomLevel, setZoomLevel] = useState(1);
+    const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
 
-export default function DashboardAdmin() {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterStatus, setFilterStatus] = useState('all');
+    const { vehicles, fetchVehiclesRecents, loading, addVehicles, error } = useVehicles();
     const { user, fetchUser } = useUserStore();
+    const { isOpen: isOpenCard, onOpen: onOpenCard, onClose: onCloseCard } = useDisclosure();
+    const { isOpen: isOpenDrawer, onOpen: onOpenDrawer, onClose: onCloseDrawer} = useDisclosure();
+
+
+    useEffect(() => {
+        fetchVehiclesRecents();
+    }, [])
+
+
+
+    const openModal = (car) => {
+        setSelectedCar(car);
+        setSelectedImageIndex(0);
+        onOpenCard();
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                delayChildren: 0.1,
+                staggerChildren: 0.05
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 30, opacity: 0, scale: 0.95 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            transition: {
+                duration: 0.6,
+                ease: [0.25, 0.46, 0.45, 0.94]
+            }
+        }
+    };
+
+    const cardHoverVariants = {
+        hover: {
+            scale: 1.02,
+            y: -8,
+            transition: {
+                duration: 0.3,
+                ease: "easeOut"
+            }
+        }
+    };
+
+
+    // Funciones de navegación
+    const goToPrevImage = () => {
+        if (selectedCar?.images?.length > 0) {
+            setSelectedImageIndex(prev =>
+                prev === 0 ? selectedCar.images.length - 1 : prev - 1
+            );
+            resetZoomAndPan();
+        }
+    };
+
+    const goToNextImage = () => {
+        if (selectedCar?.images?.length > 0) {
+            setSelectedImageIndex(prev =>
+                prev === selectedCar.images.length - 1 ? 0 : prev + 1
+            );
+            resetZoomAndPan();
+        }
+    };
+
+    // Funciones de zoom
+    const zoomIn = () => {
+        setZoomLevel(prev => Math.min(prev * 1.2, 3));
+    };
+
+    const zoomOut = () => {
+        setZoomLevel(prev => Math.max(prev / 1.2, 0.5));
+    };
+
+    const resetZoomAndPan = () => {
+        setZoomLevel(1);
+        setPanPosition({ x: 0, y: 0 });
+    };
+
+    // Funciones de pan (arrastrar)
+    const handleMouseDown = (e) => {
+        if (zoomLevel > 1) {
+            setIsDragging(true);
+            setLastMousePosition({ x: e.clientX, y: e.clientY });
+        }
+    };
+
+    const handleMouseMove = (e) => {
+        if (isDragging && zoomLevel > 1) {
+            const deltaX = e.clientX - lastMousePosition.x;
+            const deltaY = e.clientY - lastMousePosition.y;
+
+            setPanPosition(prev => ({
+                x: prev.x + deltaX,
+                y: prev.y + deltaY
+            }));
+
+            setLastMousePosition({ x: e.clientX, y: e.clientY });
+        }
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    // Función para abrir fullscreen
+    const openFullscreen = () => {
+        setIsFullscreen(true);
+        resetZoomAndPan();
+    };
+
+    // Función para cerrar fullscreen
+    const closeFullscreen = () => {
+        setIsFullscreen(false);
+        resetZoomAndPan();
+    };
+
+    // Manejo de teclas
+    const handleKeyDown = (e) => {
+        if (!isFullscreen) return;
+
+        switch (e.key) {
+            case 'Escape':
+                closeFullscreen();
+                break;
+            case 'ArrowLeft':
+                goToPrevImage();
+                break;
+            case 'ArrowRight':
+                goToNextImage();
+                break;
+            case '+':
+            case '=':
+                zoomIn();
+                break;
+            case '-':
+                zoomOut();
+                break;
+            case '0':
+                resetZoomAndPan();
+                break;
+        }
+    };
+
+    // Responsive breakpoints
+    const isMobile = useBreakpointValue({ base: true, md: false });
+    const isTablet = useBreakpointValue({ base: false, md: true, lg: false });
+    const isDesktop = useBreakpointValue({ base: false, lg: true });
 
     // Responsive values
-    const sidebarWidth = useBreakpointValue({ base: "250px", lg: "280px" });
-    const contentMargin = useBreakpointValue({
-        base: sidebarOpen ? "250px" : "0",
-        lg: sidebarOpen ? "280px" : "0"
+    const modalSize = useBreakpointValue({ base: "full", md: "4xl", lg: "6xl" });
+
+    const headerPadding = useBreakpointValue({
+        base: 4,
+        sm: 5,
+        md: 6
     });
+    const titleSize = useBreakpointValue({
+        base: "xl",
+        sm: "2xl",
+        md: "3xl",
+        lg: "4xl"
+    });
+    const subtitleSize = useBreakpointValue({
+        base: "sm",
+        sm: "md",
+        md: "lg"
+    });
+    const buttonSize = useBreakpointValue({
+        base: "sm",
+        md: "md"
+    });
+    const cardPadding = useBreakpointValue({
+        base: 4,
+        sm: 6,
+        md: 8
+    });
+
+    const gridColumns = useBreakpointValue({
+        base: "1fr",
+        sm: "repeat(auto-fit, minmax(250px, 1fr))",
+        md: "repeat(auto-fit, minmax(280px, 1fr))"
+    });
+    const gridGap = useBreakpointValue({
+        base: 4,
+        sm: 6,
+        md: 8
+    });
+
+    const metrics = [
+        {
+            key: 'vehiculos',
+            label: 'Vehículos Disponibles',
+            value: vehicles.length,
+            icon: Car,
+            gradient: 'linear(135deg, red.600, red.700)'
+        },
+        {
+            key: 'clientes',
+            label: 'Usuarios activos',
+            value: 1,
+            icon: Users,
+            change: 15.3,
+            isPositive: true,
+            gradient: 'linear(135deg, red.400, red.500)'
+        }
+    ];
+
+    // Mobile Actions Drawer Component
+
+    useEffect(() => {
+        if (isFullscreen) {
+            document.addEventListener('keydown', handleKeyDown);
+            return () => document.removeEventListener('keydown', handleKeyDown);
+        }
+    }, [isFullscreen]);
+
+    const toggleFavorite = (carId) => {
+        setFavorites(prev => {
+            const newFavorites = new Set(prev);
+            if (newFavorites.has(carId)) {
+                newFavorites.delete(carId);
+            } else {
+                newFavorites.add(carId);
+            }
+            return newFavorites;
+        });
+    };
+
+    const handleImageLoad = (index) => {
+        setLoadedImages((prev) => ({ ...prev, [index]: true }));
+    };
 
     const handleLogout = () => {
         logout();
         fetchUser();
     }
 
-    const StatCard = ({ icon, label, value, change, isPositive = true }) => (
-        <MotionBox
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            bg="gray.900"
-            p={6}
-            borderRadius="xl"
-            border="1px solid"
-            borderColor="gray.800"
-            _hover={{ borderColor: "red.500", transform: "translateY(-2px)" }}
-        >
-            <HStack justify="space-between" mb={4}>
-                <Box p={3} bg="red.500" borderRadius="lg">
-                    {React.cloneElement(icon, { size: 24, color: "white" })}
-                </Box>
-                {change && (
-                    <Badge colorScheme={isPositive ? "green" : "red"} variant="subtle">
-                        {isPositive ? "+" : "-"}{change}%
-                    </Badge>
-                )}
-            </HStack>
-            <VStack align="start" spacing={1}>
-                <Text color="gray.400" fontSize="sm" fontWeight="medium">
-                    {label}
-                </Text>
-                <Heading color="white" size="lg">
-                    {value}
-                </Heading>
-            </VStack>
-        </MotionBox>
+    // Mobile Actions Drawer Component
+    const MobileActionsDrawer = () => (
+        <Drawer isOpen={isOpenDrawer} placement="right" onClose={onCloseDrawer}>
+            <DrawerOverlay />
+            <DrawerContent bg="gray.900" color="white">
+                <DrawerCloseButton color="white" />
+                <DrawerHeader borderBottomWidth="1px" borderColor="gray.700">
+                    Acciones
+                </DrawerHeader>
+                <DrawerBody p={0}>
+                    <VStack spacing={0} align="stretch">
+                        <Button
+                            leftIcon={<Filter size={18} />}
+                            variant="ghost"
+                            justifyContent="flex-start"
+                            borderRadius={0}
+                            p={6}
+                            color="red.400"
+                            _hover={{
+                                bg: 'rgba(239, 68, 68, 0.1)',
+                                color: 'red.300'
+                            }}
+                        >
+                            Filtros
+                        </Button>
+                        <Divider borderColor="gray.700" />
+                        <Button
+                            leftIcon={<Plus size={18} />}
+                            variant="ghost"
+                            justifyContent="flex-start"
+                            borderRadius={0}
+                            p={6}
+                            color="red.400"
+                            _hover={{
+                                bg: 'rgba(239, 68, 68, 0.1)',
+                                color: 'red.300'
+                            }}
+                        >
+                            Nueva Venta
+                        </Button>
+                        <Divider borderColor="gray.700" />
+                        <Button
+                            leftIcon={<LogOutIcon size={18} />}
+                            variant="ghost"
+                            justifyContent="flex-start"
+                            borderRadius={0}
+                            p={6}
+                            color="red.400"
+                            _hover={{
+                                bg: 'rgba(239, 68, 68, 0.1)',
+                                color: 'red.300'
+                            }}
+                            onClick={() => {
+                                handleLogout();
+                                onClose();
+                            }}
+                        >
+                            Cerrar Sesión
+                        </Button>
+                    </VStack>
+                </DrawerBody>
+            </DrawerContent>
+        </Drawer>
     );
 
-    const SidebarItem = ({ icon, label, isActive = false }) => (
-        <MotionBox
-            whileHover={{ x: 5 }}
-            transition={{ duration: 0.2 }}
-        >
+    // Desktop Actions Component
+    const DesktopActions = () => (
+        <HStack spacing={4}>
             <Button
-                leftIcon={React.cloneElement(icon, { size: 20 })}
-                variant="ghost"
-                w="full"
-                justifyContent="flex-start"
-                color={isActive ? "white" : "gray.400"}
-                bg={isActive ? "red.500" : "transparent"}
+                leftIcon={<Filter size={18} />}
+                variant="outline"
+                borderColor="red.500"
+                color="red.400"
+                bg="rgba(239, 68, 68, 0.1)"
+                backdropFilter="blur(10px)"
                 _hover={{
-                    bg: isActive ? "red.600" : "gray.800",
-                    color: "white"
+                    bg: 'red.500',
+                    color: 'white',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(239, 68, 68, 0.3)'
                 }}
                 borderRadius="lg"
+                px={6}
                 py={6}
-                fontSize="md"
+                size={buttonSize}
+                transition="all 0.3s ease"
             >
-                {label}
+                Filtros
             </Button>
-        </MotionBox>
+            <Button
+                leftIcon={<Plus size={18} />}
+                bg="linear-gradient(135deg, #EF4444 0%, #DC2626 100%)"
+                color="white"
+                _hover={{
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 35px rgba(239, 68, 68, 0.4)'
+                }}
+                borderRadius="lg"
+                px={6}
+                py={6}
+                size={buttonSize}
+                fontWeight="600"
+                transition="all 0.3s ease"
+            >
+                Nueva Venta
+            </Button>
+            <Button
+                leftIcon={<LogOutIcon size={18} />}
+                variant="outline"
+                borderColor="red.500"
+                color="red.400"
+                bg="rgba(239, 68, 68, 0.1)"
+                backdropFilter="blur(10px)"
+                _hover={{
+                    bg: 'red.500',
+                    color: 'white',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(239, 68, 68, 0.3)'
+                }}
+                borderRadius="lg"
+                px={6}
+                py={6}
+                size={buttonSize}
+                transition="all 0.3s ease"
+                onClick={handleLogout}
+            >
+                Cerrar sesión
+            </Button>
+        </HStack>
+    );
+
+    // Tablet Actions Component
+    const TabletActions = () => (
+        <HStack spacing={2}>
+            <Button
+                leftIcon={<Filter size={16} />}
+                variant="outline"
+                borderColor="red.500"
+                color="red.400"
+                bg="rgba(239, 68, 68, 0.1)"
+                size="sm"
+                borderRadius="lg"
+            >
+                Filtros
+            </Button>
+            <Button
+                leftIcon={<Plus size={16} />}
+                bg="linear-gradient(135deg, #EF4444 0%, #DC2626 100%)"
+                color="white"
+                size="sm"
+                borderRadius="lg"
+            >
+                Nueva Venta
+            </Button>
+            <Menu>
+                <MenuButton
+                    as={IconButton}
+                    icon={<MoreVertical size={16} />}
+                    variant="outline"
+                    borderColor="red.500"
+                    color="red.400"
+                    size="sm"
+                />
+                <MenuList bg="gray.900" borderColor="gray.700">
+                    <MenuItem
+                        icon={<LogOutIcon size={16} />}
+                        onClick={handleLogout}
+                        bg="gray.900"
+                        color="red.400"
+                        _hover={{ bg: "rgba(239, 68, 68, 0.1)" }}
+                    >
+                        Cerrar Sesión
+                    </MenuItem>
+                </MenuList>
+            </Menu>
+        </HStack>
+    );
+
+    // Mobile Actions Component
+    const MobileActions = () => (
+        <IconButton
+            icon={<MenuIcon size={20} />}
+            variant="outline"
+            borderColor="red.500"
+            color="red.400"
+            bg="rgba(239, 68, 68, 0.1)"
+            onClick={onOpenDrawer}
+            size={buttonSize}
+            borderRadius="lg"
+        />
     );
 
     return (
-        <Box bg="black" minH="100vh">
-            {/* Sidebar */}
-            <AnimatePresence>
-                {sidebarOpen && (
-                    <MotionBox
-                        initial={{ x: -280 }}
-                        animate={{ x: 0 }}
-                        exit={{ x: -280 }}
-                        transition={{ duration: 0.3 }}
-                        position="fixed"
-                        left="0"
-                        top="0"
-                        w={sidebarWidth}
-                        h="100vh"
-                        bg="gray.900"
-                        borderRight="1px solid"
-                        borderColor="gray.800"
-                        zIndex={1000}
-                        overflowY="auto"
-                    >
-                        <VStack spacing={0} align="stretch" h="100%">
-                            {/* Logo */}
-                            <Box p={6} borderBottom="1px solid" borderColor="gray.800">
-                                <HStack>
-                                    <Box p={2} bg="red.500" borderRadius="lg">
-                                        <Car size={24} color="white" />
-                                    </Box>
-                                    <VStack align="start" spacing={0}>
-                                        <Heading size="md" color="white">
-                                            Premium Cars
-                                        </Heading>
-                                        <Text color="gray.400" fontSize="sm">
-                                            Dashboard Admin
-                                        </Text>
-                                    </VStack>
-                                </HStack>
-                            </Box>
-
-                            {/* Navigation */}
-                            <VStack spacing={2} p={4} flex="1">
-                                <SidebarItem icon={<BarChart3 />} label="Dashboard" isActive />
-                                <SidebarItem icon={<Car />} label="Vehículos" />
-                                <SidebarItem icon={<Users />} label="Clientes" />
-                                <SidebarItem icon={<DollarSign />} label="Ventas" />
-                                <SidebarItem icon={<PieChart />} label="Reportes" />
-                                <SidebarItem icon={<Calendar />} label="Calendario" />
-                                <SidebarItem icon={<Settings />} label="Configuración" />
-                            </VStack>
-
-                            {/* User Profile */}
-                            <Box p={4} borderTop="1px solid" borderColor="gray.800">
-                                <HStack>
-                                    <Avatar size="sm" name="Admin User">
-                                        <AvatarBadge boxSize="1em" bg="green.500" />
-                                    </Avatar>
-                                    <VStack align="start" spacing={0} flex="1">
-                                        <Text color="white" fontSize="sm" fontWeight="medium">
-                                            Admin User
-                                        </Text>
-                                        <Text color="gray.400" fontSize="xs">
-                                            Administrador
-                                        </Text>
-                                    </VStack>
-                                    <IconButton
-                                        aria-label="Logout"
-                                        icon={<LogOut size={16} />}
-                                        size="sm"
-                                        variant="ghost"
-                                        color="gray.400"
-                                        _hover={{ color: "red.500" }}
-                                        onClick={() => handleLogout()}
-                                    />
-                                </HStack>
-                            </Box>
-                        </VStack>
-                    </MotionBox>
-                )}
-            </AnimatePresence>
-
-            {/* Main Content */}
-            <Box
-                ml={contentMargin}
-                transition="margin-left 0.3s ease"
-                minH="100vh"
+        <Box
+            bg="linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%)"
+            minH="100vh"
+            p={8}
+            position="relative"
+            _before={{
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: 'radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(239, 68, 68, 0.05) 0%, transparent 50%)',
+                pointerEvents: 'none'
+            }}
+        >
+            <MotionBox
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                position="relative"
+                zIndex={1}
             >
-                {/* Header */}
-                <Box
-                    bg="gray.900"
-                    borderBottom="1px solid"
-                    borderColor="gray.800"
-                    px={6}
-                    py={4}
-                    position="sticky"
-                    top="0"
-                    zIndex={100}
-                >
-                    <Flex justify="space-between" align="center">
-                        <HStack>
-                            <IconButton
-                                aria-label="Toggle Sidebar"
-                                icon={sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-                                variant="ghost"
-                                color="white"
-                                onClick={() => setSidebarOpen(!sidebarOpen)}
-                            />
-                            <VStack align="start" spacing={0}>
-                                <Heading color="white" size="lg">
-                                    Dashboard
-                                </Heading>
-                                <Text color="gray.400" fontSize="sm">
-                                    Bienvenido de vuelta, Admin
-                                </Text>
-                            </VStack>
-                        </HStack>
-
-                        <HStack spacing={4}>
-                            <IconButton
-                                aria-label="Notifications"
-                                icon={<Bell size={20} />}
-                                variant="ghost"
-                                color="gray.400"
-                                _hover={{ color: "white" }}
-                                position="relative"
-                            >
-                                <Badge
-                                    colorScheme="red"
-                                    borderRadius="full"
-                                    position="absolute"
-                                    top="0"
-                                    right="0"
-                                    fontSize="xs"
-                                    w="16px"
-                                    h="16px"
-                                >
-                                    3
-                                </Badge>
-                            </IconButton>
-                            <Avatar size="sm" name="Admin User" />
-                        </HStack>
-                    </Flex>
-                </Box>
-
-                <Container maxW="7xl" p={6}>
-                    {/* Stats Grid */}
-                    <MotionGrid
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.6 }}
-                        templateColumns={{
-                            base: "repeat(1, 1fr)",
-                            md: "repeat(2, 1fr)",
-                            lg: "repeat(4, 1fr)"
+                {/* Header Mejorado */}
+                <MotionBox variants={itemVariants} mb={{ base: 6, md: 8, lg: 10 }}>
+                    <MotionFlex
+                        justify="space-between"
+                        align={{ base: "flex-start", md: "center" }}
+                        direction={{ base: "column", md: "row" }}
+                        gap={{ base: 4, md: 0 }}
+                        mb={{ base: 6, md: 8 }}
+                        p={headerPadding}
+                        bg="rgba(30, 30, 30, 0.8)"
+                        backdropFilter="blur(20px)"
+                        borderRadius={{ base: "xl", md: "2xl" }}
+                        border="1px solid rgba(239, 68, 68, 0.1)"
+                        boxShadow="0 8px 32px rgba(0, 0, 0, 0.4)"
+                        whileHover={{
+                            boxShadow: "0 12px 40px rgba(239, 68, 68, 0.2)",
+                            transition: { duration: 0.3 }
                         }}
-                        gap={6}
-                        mb={8}
                     >
-                        <StatCard
-                            icon={<Car />}
-                            label="Total Vehículos"
-                            value={mockData.stats.totalVehicles}
-                            change={12}
-                        />
-                        <StatCard
-                            icon={<TrendingUp />}
-                            label="Vendidos Este Mes"
-                            value={mockData.stats.soldThisMonth}
-                            change={23}
-                        />
-                        <StatCard
-                            icon={<DollarSign />}
-                            label="Ingresos (Q)"
-                            value={`${(mockData.stats.revenue / 1000)}K`}
-                            change={18}
-                        />
-                        <StatCard
-                            icon={<Users />}
-                            label="Usuarios Activos"
-                            value={mockData.stats.activeUsers}
-                            change={8}
-                        />
-                    </MotionGrid>
+                        <VStack align={{ base: "center", md: "start" }} spacing={1} flex="1">
+                            <Text
+                                fontSize={titleSize}
+                                fontWeight="900"
+                                bgGradient="linear(to-r, white, gray.300)"
+                                bgClip="text"
+                                letterSpacing="-0.02em"
+                                textAlign={{ base: "center", md: "left" }}
+                                lineHeight="1.1"
+                            >
+                                Dashboard Administrativo
+                            </Text>
+                            <Text
+                                color="gray.400"
+                                fontSize={subtitleSize}
+                                fontWeight="500"
+                                letterSpacing="0.02em"
+                                textAlign={{ base: "center", md: "left" }}
+                            >
+                                Gestión de Ventas Automotriz
+                            </Text>
+                        </VStack>
 
-                    <Grid
-                        templateColumns={{ base: "1fr", lg: "2fr 1fr" }}
-                        gap={8}
-                        mb={8}
-                    >
-                        {/* Recent Sales Table */}
-                        <MotionBox
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2, duration: 0.6 }}
-                            bg="gray.900"
-                            borderRadius="xl"
-                            border="1px solid"
-                            borderColor="gray.800"
+                        {/* Responsive Actions */}
+                        <Box>
+                            {isMobile && <MobileActions />}
+                            {isTablet && <TabletActions />}
+                            {isDesktop && <DesktopActions />}
+                        </Box>
+                    </MotionFlex>
+                </MotionBox>
+
+                {/* Métricas Principales Responsivas */}
+                <Grid
+                    templateColumns={gridColumns}
+                    gap={gridGap}
+                    mb={{ base: 8, md: 10, lg: 12 }}
+                >
+                    {metrics.map((metric, index) => (
+                        <MotionCard
+                            key={metric.key}
+                            bg="rgba(20, 20, 20, 0.9)"
+                            backdropFilter="blur(20px)"
+                            border="1px solid rgba(239, 68, 68, 0.1)"
+                            borderRadius={{ base: "xl", md: "2xl" }}
                             overflow="hidden"
+                            position="relative"
+                            onMouseEnter={() => setHoveredCard?.(metric.key)}
+                            onMouseLeave={() => setHoveredCard?.(null)}
+                            whileHover="hover"
+                            variants={cardHoverVariants}
+                            boxShadow="0 8px 32px rgba(0, 0, 0, 0.3)"
+                            _hover={{
+                                border: "1px solid rgba(239, 68, 68, 0.3)",
+                                boxShadow: "0 20px 60px rgba(239, 68, 68, 0.15)"
+                            }}
+                            transition="all 0.3s ease"
                         >
-                            <Box p={6} borderBottom="1px solid" borderColor="gray.800">
-                                <Flex justify="space-between" align="center" mb={4}>
-                                    <Heading color="white" size="md">
-                                        Ventas Recientes
-                                    </Heading>
-                                    <MotionButton
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        bg="red.500"
-                                        color="white"
-                                        size="sm"
-                                        _hover={{ bg: "red.600" }}
-                                        leftIcon={<Plus size={16} />}
-                                    >
-                                        Nueva Venta
-                                    </MotionButton>
-                                </Flex>
-
-                                <HStack spacing={4} mb={4}>
-                                    <InputGroup maxW="300px">
-                                        <InputLeftElement pointerEvents="none">
-                                            <Search color="gray" size={16} />
-                                        </InputLeftElement>
-                                        <Input
-                                            placeholder="Buscar ventas..."
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                            bg="gray.800"
-                                            border="none"
+                            <Box
+                                position="absolute"
+                                top={0}
+                                left={0}
+                                right={0}
+                                h="4px"
+                                bgGradient={metric.gradient}
+                            />
+                            <CardBody p={cardPadding}>
+                                <Flex
+                                    justify="space-between"
+                                    align="start"
+                                    mb={{ base: 4, md: 6 }}
+                                    direction={{ base: "column", sm: "row" }}
+                                    gap={{ base: 3, sm: 0 }}
+                                >
+                                    <Stat flex="1">
+                                        <StatLabel
+                                            color="gray.400"
+                                            fontSize={{ base: "xs", md: "sm" }}
+                                            fontWeight="600"
+                                            letterSpacing="0.05em"
+                                            textTransform="uppercase"
+                                            mb={1}
+                                        >
+                                            {metric.label}
+                                        </StatLabel>
+                                        <StatNumber
                                             color="white"
-                                            _placeholder={{ color: "gray.400" }}
-                                        />
-                                    </InputGroup>
-                                    <Select
-                                        maxW="150px"
-                                        value={filterStatus}
-                                        onChange={(e) => setFilterStatus(e.target.value)}
-                                        bg="gray.800"
-                                        border="none"
-                                        color="white"
-                                    >
-                                        <option value="all" style={{ backgroundColor: '#1A202C' }}>Todos</option>
-                                        <option value="completed" style={{ backgroundColor: '#1A202C' }}>Completadas</option>
-                                        <option value="pending" style={{ backgroundColor: '#1A202C' }}>Pendientes</option>
-                                    </Select>
-                                </HStack>
-                            </Box>
-
-                            <TableContainer>
-                                <Table variant="simple">
-                                    <Thead>
-                                        <Tr>
-                                            <Th color="gray.400" borderColor="gray.800">Vehículo</Th>
-                                            <Th color="gray.400" borderColor="gray.800">Comprador</Th>
-                                            <Th color="gray.400" borderColor="gray.800">Precio</Th>
-                                            <Th color="gray.400" borderColor="gray.800">Estado</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {mockData.recentSales.map((sale, index) => (
-                                            <MotionBox
-                                                key={sale.id}
-                                                as={Tr}
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: index * 0.1, duration: 0.3 }}
-                                                _hover={{ bg: "gray.800" }}
-                                            >
-                                                <Td color="white" borderColor="gray.800">
-                                                    {sale.vehicle}
-                                                </Td>
-                                                <Td color="gray.300" borderColor="gray.800">
-                                                    {sale.buyer}
-                                                </Td>
-                                                <Td color="red.400" fontWeight="bold" borderColor="gray.800">
-                                                    Q{sale.price.toLocaleString()}
-                                                </Td>
-                                                <Td borderColor="gray.800">
-                                                    <Badge
-                                                        colorScheme={sale.status === 'completed' ? 'green' : 'yellow'}
-                                                        variant="subtle"
-                                                    >
-                                                        {sale.status === 'completed' ? 'Completada' : 'Pendiente'}
-                                                    </Badge>
-                                                </Td>
-                                            </MotionBox>
-                                        ))}
-                                    </Tbody>
-                                </Table>
-                            </TableContainer>
-                        </MotionBox>
-
-                        {/* Top Vehicles */}
-                        <MotionBox
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.4, duration: 0.6 }}
-                            bg="gray.900"
-                            borderRadius="xl"
-                            border="1px solid"
-                            borderColor="gray.800"
-                            p={6}
-                        >
-                            <Heading color="white" size="md" mb={6}>
-                                Vehículos Más Vendidos
-                            </Heading>
-                            <VStack spacing={4} align="stretch">
-                                {mockData.topVehicles.map((vehicle, index) => (
+                                            fontSize={{ base: "2xl", sm: "3xl" }}
+                                            fontWeight="900"
+                                            mb={2}
+                                        >
+                                            {metric.value}
+                                        </StatNumber>
+                                    </Stat>
                                     <MotionBox
-                                        key={vehicle.model}
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: (index + 1) * 0.1, duration: 0.3 }}
-                                        p={4}
-                                        bg="gray.800"
-                                        borderRadius="lg"
-                                        _hover={{ bg: "gray.700" }}
+                                        p={{ base: 3, md: 4 }}
+                                        bgGradient={metric.gradient}
+                                        borderRadius={{ base: "lg", md: "xl" }}
+                                        whileHover={{
+                                            scale: 1.1,
+                                            rotate: 5,
+                                            transition: { duration: 0.2 }
+                                        }}
+                                        boxShadow="0 8px 25px rgba(239, 68, 68, 0.3)"
+                                        alignSelf={{ base: "center", sm: "flex-start" }}
                                     >
-                                        <Flex justify="space-between" align="center" mb={2}>
-                                            <Text color="white" fontWeight="medium">
-                                                {vehicle.model}
-                                            </Text>
-                                            <Badge colorScheme="red" variant="subtle">
-                                                {vehicle.sales} ventas
-                                            </Badge>
-                                        </Flex>
-                                        <Progress
-                                            value={vehicle.percentage}
-                                            colorScheme="red"
-                                            bg="gray.700"
-                                            borderRadius="full"
+                                        <metric.icon
+                                            color="white"
+                                            size={useBreakpointValue({ base: 24, md: 28 })}
                                         />
                                     </MotionBox>
-                                ))}
-                            </VStack>
-                        </MotionBox>
-                    </Grid>
-
-                    {/* Quick Actions */}
-                    <MotionBox
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6, duration: 0.6 }}
-                        bg="gray.900"
-                        borderRadius="xl"
-                        border="1px solid"
-                        borderColor="gray.800"
-                        p={6}
-                    >
-                        <Heading color="white" size="md" mb={6}>
-                            Acciones Rápidas
-                        </Heading>
-                        <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4}>
-                            {[
-                                { icon: <Car />, label: 'Agregar Vehículo', color: 'red' },
-                                { icon: <Users />, label: 'Nuevo Cliente', color: 'blue' },
-                                { icon: <BarChart3 />, label: 'Ver Reportes', color: 'green' },
-                                { icon: <Settings />, label: 'Configuración', color: 'purple' }
-                            ].map((action, index) => (
-                                <MotionButton
-                                    key={action.label}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: (index + 1) * 0.1, duration: 0.3 }}
-                                    leftIcon={React.cloneElement(action.icon, { size: 20 })}
-                                    variant="outline"
-                                    borderColor="gray.700"
-                                    color="white"
-                                    _hover={{
-                                        borderColor: `${action.color}.500`,
-                                        color: `${action.color}.500`,
-                                        bg: "gray.800"
+                                </Flex>
+                                <Progress
+                                    value={75}
+                                    size={{ base: "sm", md: "sm" }}
+                                    colorScheme="red"
+                                    bg="gray.800"
+                                    borderRadius="full"
+                                    sx={{
+                                        '& > div': {
+                                            background: metric.gradient
+                                        }
                                     }}
-                                    h="60px"
-                                    flexDirection="column"
-                                    fontSize="sm"
-                                >
-                                    {action.label}
-                                </MotionButton>
-                            ))}
-                        </SimpleGrid>
-                    </MotionBox>
-                </Container>
-            </Box>
+                                />
+                            </CardBody>
+                        </MotionCard>
+                    ))}
+                </Grid>
+
+                {/* Mobile Actions Drawer */}
+                <MobileActionsDrawer />
+
+                {/* Contenido Principal Mejorado */}
+                <Grid gap={8}>
+                    {/* Ventas Recientes Mejoradas */}
+                    <GridItem>
+                        <MotionCard
+                            variants={itemVariants}
+                            bg="rgba(20, 20, 20, 0.9)"
+                            backdropFilter="blur(20px)"
+                            border="1px solid rgba(239, 68, 68, 0.1)"
+                            borderRadius="2xl"
+                            boxShadow="0 8px 32px rgba(0, 0, 0, 0.3)"
+                            overflow="hidden"
+                        >
+                            <Box
+                                position="absolute"
+                                top={0}
+                                left={0}
+                                right={0}
+                                h="3px"
+                                bgGradient="linear(90deg, red.500, orange.500, red.500)"
+                            />
+                            <CardHeader p={8} pb={4}>
+                                <Flex justify="space-between" align="center">
+                                    <HStack spacing={3}>
+                                        <Circle size="12px" bg="red.500" />
+                                        <Text
+                                            color="white"
+                                            fontSize="2xl"
+                                            fontWeight="800"
+                                            letterSpacing="-0.01em"
+                                        >
+                                            Agregados recientemente
+                                        </Text>
+                                    </HStack>
+                                    <IconButton
+                                        icon={<MoreVertical />}
+                                        variant="ghost"
+                                        color="gray.400"
+                                        size="sm"
+                                        _hover={{ color: 'red.400', bg: 'rgba(239, 68, 68, 0.1)' }}
+                                        borderRadius="lg"
+                                    />
+                                </Flex>
+                            </CardHeader>
+                            <CardBody pt={0} p={8}>
+                                <Grid templateColumns={gridColumns} gap={{ base: 4, md: 6 }}>
+                                    {vehicles.map((car, index) => (
+                                        <MotionBox
+                                            key={car._id}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: index * 0.1, duration: 0.5 }}
+                                            bg="gray.900"
+                                            borderRadius="xl"
+                                            overflow="hidden"
+                                            border="1px solid"
+                                            borderColor="gray.800"
+                                            _hover={{ borderColor: "red.500", transform: "translateY(-5px)" }}
+                                            cursor="pointer"
+                                            onClick={() => openModal(car)}
+                                        >
+                                            <Box position="relative">
+                                                <Image
+                                                    src={car.images[0].url}
+                                                    alt={car.name}
+                                                    w="100%"
+                                                    h={{ base: "180px", md: "200px" }}
+                                                    objectFit="cover"
+                                                />
+                                                <IconButton
+                                                    aria-label="Toggle favorite"
+                                                    icon={
+                                                        <Heart
+                                                            size={20}
+                                                            fill={favorites.has(car._id) ? "#ef4444" : "none"}
+                                                            color={favorites.has(car._id) ? "#ef4444" : "white"}
+                                                        />
+                                                    }
+                                                    position="absolute"
+                                                    top={3}
+                                                    right={3}
+                                                    size="sm"
+                                                    bg="rgba(0,0,0,0.6)"
+                                                    color="white"
+                                                    borderRadius="full"
+                                                    _hover={{ bg: "red.500" }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        toggleFavorite(car._id);
+                                                    }}
+                                                />
+                                            </Box>
+
+                                            <Box p={{ base: 4, md: 6 }}>
+                                                <Heading color="white" size="md" mb={2}>
+                                                    {car.name} {car.model} {car.year}
+                                                </Heading>
+                                                <Text color="red.400" fontSize="xl" fontWeight="bold" mb={4}>
+                                                    Q{car.price.$numberDecimal}
+                                                </Text>
+                                                <Stack
+                                                    direction={{ base: "column", sm: "row" }}
+                                                    spacing={4}
+                                                    mb={4}
+                                                    flexWrap="wrap"
+                                                >
+                                                    <Text color="gray.400" fontSize="sm">
+                                                        {car.year}
+                                                    </Text>
+                                                    <Text color="gray.400" fontSize="sm">
+                                                        {car.model}
+                                                    </Text>
+                                                    <Text color="gray.400" fontSize="sm">
+                                                        {car.status === true ? "DISPONIBLE" : "NO DISPONIBLE"}
+                                                    </Text>
+                                                </Stack>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    borderColor="red.500"
+                                                    color="red.500"
+                                                    _hover={{ bg: "red.500", color: "white" }}
+                                                    w="100%"
+                                                >
+                                                    Ver Detalles
+                                                </Button>
+                                            </Box>
+                                        </MotionBox>
+                                    ))}
+                                </Grid>
+
+                                {/* Modal Principal */}
+                                <Modal isOpen={isOpenCard} onClose={onCloseCard} size={modalSize}>
+                                    <ModalOverlay bg="rgba(0,0,0,0.8)" />
+                                    <ModalContent
+                                        bg="gray.900"
+                                        color="white"
+                                        borderRadius="xl"
+                                        mx={{ base: 4, md: 6 }}
+                                        my={{ base: 4, md: "auto" }}
+                                    >
+                                        <ModalHeader>
+                                            <Heading size={{ base: "md", md: "lg" }}>
+                                                {selectedCar?.name}
+                                            </Heading>
+                                            <Text color="red.400" fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">
+                                                Q{selectedCar?.price.$numberDecimal}
+                                            </Text>
+                                        </ModalHeader>
+                                        <ModalCloseButton />
+                                        <ModalBody>
+                                            <Grid
+                                                templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+                                                gap={{ base: 4, md: 7 }}
+                                            >
+                                                {/* Imagen principal y miniaturas */}
+                                                <GridItem>
+                                                    <Box position="relative" mb={4}>
+                                                        <Image
+                                                            src={selectedCar?.images[selectedImageIndex]?.url}
+                                                            alt={selectedCar?.name}
+                                                            w="100%"
+                                                            h={{ base: "250px", md: "300px" }}
+                                                            objectFit="cover"
+                                                            borderRadius="lg"
+                                                        />
+
+                                                        {/* Botón de maximizar en esquina inferior derecha */}
+                                                        <IconButton
+                                                            icon={<Maximize2 size={16} />}
+                                                            aria-label="Maximizar imagen"
+                                                            position="absolute"
+                                                            bottom={2}
+                                                            right={2}
+                                                            size="sm"
+                                                            bg="rgba(0,0,0,0.7)"
+                                                            color="white"
+                                                            _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                                            borderRadius="md"
+                                                            onClick={openFullscreen}
+                                                        />
+
+                                                        {/* Navegación en imagen principal (solo si hay múltiples imágenes) */}
+                                                        {selectedCar?.images?.length > 1 && (
+                                                            <>
+                                                                <IconButton
+                                                                    icon={<ChevronLeft size={20} />}
+                                                                    aria-label="Imagen anterior"
+                                                                    position="absolute"
+                                                                    left={2}
+                                                                    top="50%"
+                                                                    transform="translateY(-50%)"
+                                                                    size="sm"
+                                                                    bg="rgba(0,0,0,0.7)"
+                                                                    color="white"
+                                                                    _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                                                    borderRadius="full"
+                                                                    onClick={goToPrevImage}
+                                                                />
+                                                                <IconButton
+                                                                    icon={<ChevronRight size={20} />}
+                                                                    aria-label="Imagen siguiente"
+                                                                    position="absolute"
+                                                                    right={2}
+                                                                    top="50%"
+                                                                    transform="translateY(-50%)"
+                                                                    size="sm"
+                                                                    bg="rgba(0,0,0,0.7)"
+                                                                    color="white"
+                                                                    _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                                                    borderRadius="full"
+                                                                    onClick={goToNextImage}
+                                                                />
+                                                            </>
+                                                        )}
+
+                                                        {/* Contador de imágenes */}
+                                                        {selectedCar?.images?.length > 1 && (
+                                                            <Box
+                                                                position="absolute"
+                                                                bottom={2}
+                                                                left={2}
+                                                                bg="rgba(0,0,0,0.7)"
+                                                                color="white"
+                                                                px={2}
+                                                                py={1}
+                                                                borderRadius="md"
+                                                                fontSize="xs"
+                                                            >
+                                                                {selectedImageIndex + 1} / {selectedCar.images.length}
+                                                            </Box>
+                                                        )}
+                                                    </Box>
+
+                                                    {/* Galería responsiva */}
+                                                    <Box
+                                                        maxH={{ base: "auto", md: "500px" }}
+                                                        overflowY="auto"
+                                                        overflowX={{ base: "auto", md: "visible" }}
+                                                        pr={2}
+                                                    >
+                                                        {loading ? (
+                                                            <p>Cargando</p>
+                                                        ) : (
+                                                            <Wrap spacing="10px">
+                                                                {selectedCar?.images.map((img, index) => (
+                                                                    <WrapItem key={index}>
+                                                                        <Box
+                                                                            w={{ base: "60px", md: "80px" }}
+                                                                            h={{ base: "45px", md: "60px" }}
+                                                                            position="relative"
+                                                                        >
+                                                                            {!loadedImages[index] && (
+                                                                                <Skeleton
+                                                                                    w="100%"
+                                                                                    h="100%"
+                                                                                    borderRadius="md"
+                                                                                    startColor="gray.600"
+                                                                                    endColor="gray.700"
+                                                                                    fadeDuration={0.2}
+                                                                                    position="absolute"
+                                                                                    top="0"
+                                                                                    left="0"
+                                                                                />
+                                                                            )}
+                                                                            <Image
+                                                                                src={img.url}
+                                                                                alt={`${selectedCar.name} ${index + 1}`}
+                                                                                w="100%"
+                                                                                h="100%"
+                                                                                objectFit="cover"
+                                                                                borderRadius="md"
+                                                                                cursor="pointer"
+                                                                                border="2px solid"
+                                                                                borderColor={
+                                                                                    selectedImageIndex === index ? "red.500" : "transparent"
+                                                                                }
+                                                                                onClick={() => setSelectedImageIndex(index)}
+                                                                                onLoad={() => handleImageLoad(index)}
+                                                                                display={loadedImages[index] ? "block" : "none"}
+                                                                                flexShrink={0}
+                                                                            />
+                                                                        </Box>
+                                                                    </WrapItem>
+                                                                ))}
+                                                            </Wrap>
+                                                        )}
+                                                    </Box>
+                                                </GridItem>
+
+                                                {/* Detalles */}
+                                                <GridItem>
+                                                    <VStack align="start" spacing={4}>
+                                                        <Text color="red.400" fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">
+                                                            Descripción
+                                                        </Text>
+                                                        <Text color="gray.300" fontSize={{ base: "md", md: "lg" }}>
+                                                            {selectedCar?.description}
+                                                        </Text>
+
+                                                        <Divider borderColor="gray.700" />
+
+                                                        <Box>
+                                                            <Heading size="md" mb={3}>Especificaciones</Heading>
+                                                            <Grid templateColumns={{ base: "1fr", sm: "1fr 1fr" }} gap={4}>
+                                                                <VStack align="start">
+                                                                    <HStack>
+                                                                        <Calendar size={18} color="#ef4444" />
+                                                                        <Text fontSize="sm">Año: {selectedCar?.year}</Text>
+                                                                    </HStack>
+                                                                    <HStack>
+                                                                        <Gauge size={18} color="#ef4444" />
+                                                                        <Text fontSize="sm">Línea: {selectedCar?.model}</Text>
+                                                                    </HStack>
+                                                                </VStack>
+                                                                <VStack align="start">
+                                                                    <HStack>
+                                                                        <Fuel size={18} color="#ef4444" />
+                                                                        <Text fontSize="sm">Precio: Q{selectedCar?.price?.$numberDecimal}</Text>
+                                                                    </HStack>
+                                                                </VStack>
+                                                            </Grid>
+                                                        </Box>
+
+                                                        <Divider borderColor="gray.700" />
+
+                                                        <Box>
+                                                            <Heading size="md" mb={3}>Contacto</Heading>
+                                                            <VStack align="start" spacing={2}>
+                                                                <HStack>
+                                                                    <Phone size={18} color="#ef4444" />
+                                                                    <Text as='a' href='tel:30300738' fontSize="sm">
+                                                                        +502 3030-0738
+                                                                    </Text>
+                                                                </HStack>
+                                                                <HStack>
+                                                                    <Mail size={18} color="#ef4444" />
+                                                                    <Text fontSize="sm">ventas@premiumcars.com</Text>
+                                                                </HStack>
+                                                                <HStack>
+                                                                    <MapPin size={18} color="#ef4444" />
+                                                                    <Text fontSize="sm">Guatemala, Zona 18, km 10.5</Text>
+                                                                </HStack>
+                                                            </VStack>
+                                                        </Box>
+                                                    </VStack>
+                                                </GridItem>
+                                            </Grid>
+                                        </ModalBody>
+
+                                        <ModalFooter>
+                                            <Stack
+                                                direction={{ base: "column", sm: "row" }}
+                                                spacing={4}
+                                                w="100%"
+                                            >
+                                                <Button
+                                                    bg="red.500"
+                                                    color="white"
+                                                    _hover={{ bg: "red.600" }}
+                                                    size={{ base: "md", md: "lg" }}
+                                                    px={8}
+                                                    flex={1}
+                                                >
+                                                    Contactar Vendedor
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    borderColor="red.500"
+                                                    color="red.500"
+                                                    _hover={{ bg: "red.500", color: "white" }}
+                                                    size={{ base: "md", md: "lg" }}
+                                                    px={8}
+                                                    onClick={() => toggleFavorite(selectedCar._id)}
+                                                    flex={1}
+                                                >
+                                                    {favorites.has(selectedCar?._id) ? "Remover de Favoritos" : "Agregar a Favoritos"}
+                                                </Button>
+                                            </Stack>
+                                        </ModalFooter>
+                                    </ModalContent>
+                                </Modal>
+
+                                {/* Modal Fullscreen para zoom e imágenes */}
+                                <Modal isOpen={isFullscreen} onClose={closeFullscreen} size="full">
+                                    <ModalOverlay bg="rgba(0,0,0,0.95)" />
+                                    <ModalContent bg="transparent" boxShadow="none">
+                                        <Box
+                                            position="relative"
+                                            w="100vw"
+                                            h="100vh"
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="center"
+                                            overflow="hidden"
+                                        >
+                                            {/* Imagen con zoom */}
+                                            <Box
+                                                w="100%"
+                                                h="100%"
+                                                display="flex"
+                                                alignItems="center"
+                                                justifyContent="center"
+                                                cursor={zoomLevel > 1 ? (isDragging ? "grabbing" : "grab") : "default"}
+                                                onMouseDown={handleMouseDown}
+                                                onMouseMove={handleMouseMove}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseLeave={handleMouseUp}
+                                            >
+                                                <Image
+                                                    src={selectedCar?.images[selectedImageIndex]?.url}
+                                                    alt={selectedCar?.name}
+                                                    maxW="90%"
+                                                    maxH="90%"
+                                                    objectFit="contain"
+                                                    transform={`scale(${zoomLevel}) translate(${panPosition.x}px, ${panPosition.y}px)`}
+                                                    transition={isDragging ? "none" : "transform 0.2s ease"}
+                                                    userSelect="none"
+                                                    pointerEvents={zoomLevel > 1 ? "auto" : "none"}
+                                                />
+                                            </Box>
+
+                                            {/* Controles de zoom */}
+                                            <VStack
+                                                position="absolute"
+                                                right={4}
+                                                top="50%"
+                                                transform="translateY(-50%)"
+                                                spacing={2}
+                                                bg="rgba(0,0,0,0.7)"
+                                                borderRadius="md"
+                                                p={2}
+                                            >
+                                                <IconButton
+                                                    icon={<ZoomIn size={16} />}
+                                                    aria-label="Zoom in"
+                                                    size="sm"
+                                                    bg="transparent"
+                                                    color="white"
+                                                    _hover={{ bg: "rgba(255,255,255,0.2)" }}
+                                                    onClick={zoomIn}
+                                                    isDisabled={zoomLevel >= 3}
+                                                />
+                                                <Text color="white" fontSize="xs" textAlign="center">
+                                                    {Math.round(zoomLevel * 100)}%
+                                                </Text>
+                                                <IconButton
+                                                    icon={<ZoomOut size={16} />}
+                                                    aria-label="Zoom out"
+                                                    size="sm"
+                                                    bg="transparent"
+                                                    color="white"
+                                                    _hover={{ bg: "rgba(255,255,255,0.2)" }}
+                                                    onClick={zoomOut}
+                                                    isDisabled={zoomLevel <= 0.5}
+                                                />
+                                            </VStack>
+
+                                            {/* Navegación entre imágenes */}
+                                            {selectedCar?.images?.length > 1 && (
+                                                <>
+                                                    <IconButton
+                                                        icon={<ChevronLeft size={32} />}
+                                                        aria-label="Imagen anterior"
+                                                        position="absolute"
+                                                        left={4}
+                                                        top="50%"
+                                                        transform="translateY(-50%)"
+                                                        size="lg"
+                                                        bg="rgba(0,0,0,0.7)"
+                                                        color="white"
+                                                        _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                                        borderRadius="full"
+                                                        onClick={goToPrevImage}
+                                                    />
+                                                    <IconButton
+                                                        icon={<ChevronRight size={32} />}
+                                                        aria-label="Imagen siguiente"
+                                                        position="absolute"
+                                                        right={20}
+                                                        top="50%"
+                                                        transform="translateY(-50%)"
+                                                        size="lg"
+                                                        bg="rgba(0,0,0,0.7)"
+                                                        color="white"
+                                                        _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                                        borderRadius="full"
+                                                        onClick={goToNextImage}
+                                                    />
+                                                </>
+                                            )}
+
+                                            {/* Botón de cerrar */}
+                                            <IconButton
+                                                icon={<X size={24} />}
+                                                aria-label="Cerrar"
+                                                position="absolute"
+                                                top={4}
+                                                right={4}
+                                                size="lg"
+                                                bg="rgba(0,0,0,0.7)"
+                                                color="white"
+                                                _hover={{ bg: "rgba(0,0,0,0.9)" }}
+                                                borderRadius="full"
+                                                onClick={closeFullscreen}
+                                            />
+
+                                            {/* Información de la imagen */}
+                                            <Box
+                                                position="absolute"
+                                                bottom={4}
+                                                left={4}
+                                                bg="rgba(0,0,0,0.7)"
+                                                color="white"
+                                                px={4}
+                                                py={2}
+                                                borderRadius="md"
+                                            >
+                                                <Text fontSize="sm" fontWeight="bold">
+                                                    {selectedCar?.name}
+                                                </Text>
+                                                {selectedCar?.images?.length > 1 && (
+                                                    <Text fontSize="xs" color="gray.300">
+                                                        Imagen {selectedImageIndex + 1} de {selectedCar.images.length}
+                                                    </Text>
+                                                )}
+                                            </Box>
+
+                                            {/* Instrucciones de uso */}
+                                            <Box
+                                                position="absolute"
+                                                top={4}
+                                                left={4}
+                                                bg="rgba(0,0,0,0.7)"
+                                                color="white"
+                                                px={3}
+                                                py={2}
+                                                borderRadius="md"
+                                                fontSize="xs"
+                                            >
+                                                <Text>ESC: Salir • ←→: Navegar • +/-: Zoom • Arrastrar para mover</Text>
+                                            </Box>
+                                        </Box>
+                                    </ModalContent>
+                                </Modal>
+                            </CardBody>
+                        </MotionCard>
+                    </GridItem>
+                </Grid>
+            </MotionBox>
         </Box>
     );
-}
+};
+
+export default AutoSalesDashboard;

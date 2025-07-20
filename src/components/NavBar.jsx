@@ -48,6 +48,8 @@ import {
 } from 'lucide-react';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import useUserStore from '../context/UserStore';
+import { HamburgerIcon } from '@chakra-ui/icons';
 
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
@@ -60,19 +62,13 @@ export default function PremiumNavbar({contactRef}) {
     const [searchValue, setSearchValue] = useState('');
     const [notifications, setNotifications] = useState(5);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { user, fetchUser } = useUserStore();
     
     const navItems = [
         {
             label: 'Vehículos',
             icon: Car,
-            submenu: [
-                { label: 'Deportivos', icon: Zap },
-                { label: 'Sedán', icon: Car },
-                { label: 'SUV', icon: Car },
-                { label: 'Eléctricos', icon: Zap },
-                { label: 'Híbridos', icon: Car },
-                { label: 'Clásicos', icon: Award }
-            ]
+            href: '/catalog'
         },
         {
             label: 'Servicios',
@@ -131,9 +127,11 @@ export default function PremiumNavbar({contactRef}) {
                     <Flex align="center" justify="space-between">
                         {/* Logo */}
                         <MotionFlex
+                            as='a'
                             align="center"
                             whileHover={{ scale: 1.05 }}
                             cursor="pointer"
+                            href='/'
                         >
                             <MotionBox
                                 w="160px"
@@ -144,7 +142,7 @@ export default function PremiumNavbar({contactRef}) {
                                 mr={3}
                             >
                                 <Image
-                                    src="/LogoJuanes.png"
+                                    src="https://res.cloudinary.com/dbh9jfkoh/image/upload/v1752969460/LogoJuanes_ner8yk.png"
                                     w="100%"
                                     h="100%"
                                     objectFit="contain"
@@ -168,6 +166,7 @@ export default function PremiumNavbar({contactRef}) {
                             {navItems.map((item, index) => (
                                 <Box key={index} position="relative">
                                     <MotionButton
+                                        as='a'
                                         variant="ghost"
                                         color="white"
                                         size="md"
@@ -187,6 +186,7 @@ export default function PremiumNavbar({contactRef}) {
                                         position="relative"
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
+                                        href={item.href}
                                     >
                                         {item.label}
                                         {item.badge && (
@@ -327,9 +327,9 @@ export default function PremiumNavbar({contactRef}) {
                             {/* Mobile Menu Button */}
                             <IconButton
                                 aria-label="Open menu"
-                                icon={<Menu size={24} />}
+                                icon={<HamburgerIcon size={24} />}
                                 variant="outline"
-                                color="whiteAlpha.100"
+                                color="whiteAlpha.900"
                                 display={{ base: 'flex', lg: 'none' }}
                                 _hover={{ color: "red.400" }}
                                 onClick={onOpen}

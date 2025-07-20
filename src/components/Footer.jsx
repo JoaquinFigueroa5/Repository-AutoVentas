@@ -100,7 +100,7 @@ const ContactFooter = ({ contactRef }) => {
             icon: FaWhatsapp,
             label: 'WhatsApp',
             value: '+502 3030-0738',
-            action: 'https://wa.me/30300738'
+            action: `https://wa.me/50230300738?text=${encodeURIComponent('Hola, vengo de la página web y quisiera cotizar...')}`
         },
         {
             icon: FaEnvelope,

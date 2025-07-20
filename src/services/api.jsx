@@ -49,6 +49,17 @@ export const getVehicles = async() => {
         }
     }
 }
+export const getVehiclesRecents = async() => {
+    try {
+        return await apiClient.get('/vehicles/recents')
+    } catch (error) {
+        const msg = error.response?.data?.msg || 'Error'
+        return {
+            error: true,
+            msg
+        }
+    }
+}
 
 export const addVehicles = async(data) => {
     try {

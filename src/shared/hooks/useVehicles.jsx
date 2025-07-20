@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@chakra-ui/react";
-import { getVehicles as getVehiclesRequest, addVehicles as addVehiclesRequest } from "../../services";
+import { getVehicles as getVehiclesRequest, addVehicles as addVehiclesRequest, getVehiclesRecents as getVehiclesRecentsRequest } from "../../services";
 
 const useVehicles = () => {
     const [vehicles, setVehicles] = useState([]);
@@ -13,6 +13,18 @@ const useVehicles = () => {
         setLoading(true);
         try {
             const response = await getVehiclesRequest();
+            setVehicles(response.data.vehicles)
+        } catch (error) {
+            setError(error.response?.data?.msg || 'Error loading vehicles')
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const fetchVehiclesRecents = async () => {
+        setLoading(true);
+        try {
+            const response = await getVehiclesRecentsRequest();
             setVehicles(response.data.vehicles)
         } catch (error) {
             setError(error.response?.data?.msg || 'Error loading vehicles')
@@ -57,7 +69,8 @@ const useVehicles = () => {
         fetchVehicles();
     }, []);
 
-    return { vehicles, fetchVehicles, addVehicles, loading, error };
+
+    return { vehicles, fetchVehicles, addVehicles, loading, error, fetchVehiclesRecents };
 };
 
 export default useVehicles;
