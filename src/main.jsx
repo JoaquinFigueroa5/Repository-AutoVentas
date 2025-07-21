@@ -7,11 +7,10 @@ import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <UserProvider>
-      <ChakraProvider>
+    <ChakraProvider>
+      <UserProvider>
         <App />
-      </ChakraProvider>
-    </UserProvider>
+      </UserProvider>
+    </ChakraProvider>
   </BrowserRouter>
-
 )

@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@chakra-ui/react";
-import { getVehicles as getVehiclesRequest, addVehicles as addVehiclesRequest, getVehiclesRecents as getVehiclesRecentsRequest } from "../../services";
+import { 
+    getVehicles as getVehiclesRequest, 
+    addVehicles as addVehiclesRequest, 
+    getVehiclesRecents as getVehiclesRecentsRequest,
+    deleteVehicles as deleteVehiclesRequest
+} from "../../services";
 
 const useVehicles = () => {
     const [vehicles, setVehicles] = useState([]);
@@ -50,6 +55,11 @@ const useVehicles = () => {
                 isClosable: true,
                 position: "top-right",
             });
+
+            await fetchVehiclesRecents();
+
+            return response;
+
         } catch (error) {
             setError(error);
             toast({
@@ -60,17 +70,59 @@ const useVehicles = () => {
                 isClosable: true,
                 position: "top-right",
             });
+            throw error;
+        } finally {
+            setLoading(false);
         }
-        await fetchVehicles();
     };
 
+    const deleteVehicles = async(id) => {
+        setLoading(true);
+        try {
+            const response = deleteVehiclesRequest(id);
+
+            if (response.error) {
+                throw new Error(response.msg);
+            }
+
+            toast({
+                title: "Vehículo eliminado",
+                description: "El vehículo fue eliminado correctamente.",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right",
+            });
+
+            await fetchVehiclesRecents();
+
+            return response;
+
+        } catch (error) {
+            setError(error.response?.data?.msg || 'Error to delete vehicle');
+            toast({
+                title: "Vehículo no ha podido ser eliminado",
+                description: "El vehículo no fue eliminado correctamente.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
         fetchVehicles();
     }, []);
 
+    useEffect(() => {
+        fetchVehiclesRecents();
+    }, []);
 
-    return { vehicles, fetchVehicles, addVehicles, loading, error, fetchVehiclesRecents };
+
+    return { vehicles, fetchVehicles, addVehicles, loading, error, fetchVehiclesRecents, deleteVehicles };
 };
 
 export default useVehicles;

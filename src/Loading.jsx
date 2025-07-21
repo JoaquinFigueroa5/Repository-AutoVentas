@@ -5,59 +5,22 @@ const MotionBox = motion(Box);
 const MotionText = motion(Text);
 
 const spinnerStyles = `
-  @keyframes spin {
+  @keyframes rotate {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
   
-  @keyframes reverseSpin {
-    0% { transform: rotate(360deg); }
-    100% { transform: rotate(0deg); }
+  @keyframes fadeInOut {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
   }
   
-  @keyframes pulse {
-    0%, 100% { 
-      transform: scale(1);
-      opacity: 0.8;
-    }
-    50% { 
-      transform: scale(1.1);
-      opacity: 1;
-    }
+  .spinner-rotate {
+    animation: rotate 1.5s linear infinite;
   }
   
-  @keyframes glow {
-    0%, 100% { 
-      box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
-    }
-    50% { 
-      box-shadow: 0 0 40px rgba(220, 38, 38, 0.8), 0 0 60px rgba(220, 38, 38, 0.4);
-    }
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  .spinner-ring {
-    animation: spin 2s linear infinite;
-  }
-  
-  .spinner-ring-reverse {
-    animation: reverseSpin 3s linear infinite;
-  }
-  
-  .spinner-pulse {
-    animation: pulse 2s ease-in-out infinite;
-  }
-  
-  .glow-effect {
-    animation: glow 2s ease-in-out infinite;
-  }
-  
-  .float-effect {
-    animation: float 3s ease-in-out infinite;
+  .fade-pulse {
+    animation: fadeInOut 2s ease-in-out infinite;
   }
 `;
 
@@ -70,192 +33,117 @@ function Loading() {
         align="center"
         justify="center"
         height="100vh"
-        bg="linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 50%, #000000 100%)"
+        bg="#000000"
         position="relative"
-        overflow="hidden"
+        flexDirection="column"
+        gap={8}
       >
-        {/* Elementos de fondo decorativos */}
-        <Box
-          position="absolute"
-          width="400px"
-          height="400px"
-          bg="radial-gradient(circle, rgba(220, 38, 38, 0.05) 0%, transparent 70%)"
-          borderRadius="full"
-          pointerEvents="none"
-          className="spinner-pulse"
-          top="20%"
-          left="10%"
-        />
-
-        <Box
-          position="absolute"
-          width="300px"
-          height="300px"
-          bg="radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%)"
-          borderRadius="full"
-          pointerEvents="none"
-          className="float-effect"
-          bottom="20%"
-          right="15%"
-        />
-
-        {/* Contenedor principal del spinner */}
+        {/* Spinner principal */}
         <MotionBox
-          initial={{ scale: 0.3, opacity: 0, rotate: -180 }}
-          animate={{ scale: 1, opacity: 1, rotate: 0 }}
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{
-            duration: 1.2,
-            ease: "easeOut",
-            type: "spring",
-            stiffness: 100
+            duration: 0.6,
+            ease: "easeOut"
           }}
           position="relative"
         >
-          {/* Anillo exterior */}
+          {/* Círculo principal con borde rojo */}
           <Box
-            width="120px"
-            height="120px"
-            border="1px solid"
-            borderColor="whiteAlpha.200"
-            borderRadius="full"
-            position="absolute"
-            top="50%"
-            left="50%"
-            transform="translate(-50%, -50%)"
-            className="spinner-ring-reverse"
-          />
-
-          {/* Anillo principal */}
-          <Box
-            width="80px"
-            height="80px"
-            border="3px solid"
-            borderColor="whiteAlpha.100"
+            width="60px"
+            height="60px"
+            border="2px solid transparent"
             borderTopColor="#DC2626"
             borderRightColor="#DC2626"
             borderRadius="full"
-            className="spinner-ring glow-effect"
+            className="spinner-rotate"
             position="relative"
           >
-            {/* Punto brillante en el anillo */}
+            {/* Punto indicador en el spinner */}
             <Box
               position="absolute"
-              top="-4px"
-              left="50%"
-              transform="translateX(-50%)"
-              width="8px"
-              height="8px"
+              top="-3px"
+              right="-3px"
+              width="6px"
+              height="6px"
               bg="#DC2626"
               borderRadius="full"
-              boxShadow="0 0 15px rgba(220, 38, 38, 0.9), 0 0 25px rgba(220, 38, 38, 0.5)"
-            />
-
-            {/* Centro del spinner */}
-            <Box
-              position="absolute"
-              top="50%"
-              left="50%"
-              transform="translate(-50%, -50%)"
-              width="20px"
-              height="20px"
-              bg="linear-gradient(45deg, #FFFFFF 0%, #DC2626 100%)"
-              borderRadius="full"
-              boxShadow="0 0 10px rgba(255, 255, 255, 0.5)"
-              className="spinner-pulse"
+              boxShadow="0 0 8px rgba(220, 38, 38, 0.8)"
             />
           </Box>
 
-          {/* Anillo interior decorativo */}
+          {/* Círculo interior sutil */}
           <Box
-            width="40px"
-            height="40px"
-            border="1px solid"
-            borderColor="rgba(255, 255, 255, 0.3)"
-            borderRadius="full"
             position="absolute"
             top="50%"
             left="50%"
             transform="translate(-50%, -50%)"
-            className="spinner-ring"
+            width="20px"
+            height="20px"
+            border="1px solid rgba(255, 255, 255, 0.2)"
+            borderRadius="full"
+            className="fade-pulse"
           />
         </MotionBox>
 
-        {/* Texto de carga */}
+        {/* Texto de carga minimalista */}
         <MotionText
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
-            delay: 0.8,
-            duration: 0.8,
-            repeat: Infinity,
-            repeatType: "reverse",
-            repeatDelay: 1
+            delay: 0.3,
+            duration: 0.5
           }}
-          position="absolute"
-          bottom="30%"
-          color="whiteAlpha.800"
+          color="rgba(255, 255, 255, 0.7)"
           fontSize="sm"
-          fontWeight="medium"
-          letterSpacing="2px"
-          textTransform="uppercase"
+          fontWeight="400"
+          letterSpacing="1px"
         >
-          Cargando...
+          Cargando
         </MotionText>
 
-        {/* Partículas decorativas */}
-        {[...Array(6)].map((_, i) => (
-          <MotionBox
-            key={i}
-            position="absolute"
-            width="4px"
-            height="4px"
-            bg="rgba(220, 38, 38, 0.6)"
-            borderRadius="full"
-            initial={{
-              scale: 0,
-              x: 0,
-              y: 0,
-              opacity: 0
-            }}
-            animate={{
-              scale: [0, 1, 0],
-              x: [0, (i % 2 === 0 ? 100 : -100)],
-              y: [0, (i % 3 === 0 ? -80 : 80)],
-              opacity: [0, 1, 0]
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              delay: i * 0.5,
-              ease: "easeOut"
-            }}
-            style={{
-              filter: "blur(0.5px)"
-            }}
-          />
-        ))}
+        {/* Tres puntos animados debajo del texto */}
+        <Flex gap={2} position="absolute" bottom="35%">
+          {[0, 1, 2].map((index) => (
+            <MotionBox
+              key={index}
+              width="4px"
+              height="4px"
+              bg="rgba(220, 38, 38, 0.8)"
+              borderRadius="full"
+              animate={{
+                opacity: [0.3, 1, 0.3],
+                scale: [1, 1.2, 1]
+              }}
+              transition={{
+                duration: 1.2,
+                repeat: Infinity,
+                delay: index * 0.2,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+        </Flex>
 
-        {/* Efectos de luz en las esquinas */}
+        {/* Elemento decorativo sutil en la esquina */}
         <Box
           position="absolute"
-          top="0"
-          left="0"
-          width="200px"
-          height="200px"
-          bg="radial-gradient(circle at center, rgba(220, 38, 38, 0.1) 0%, transparent 50%)"
-          pointerEvents="none"
-          className="spinner-pulse"
+          top="20px"
+          right="20px"
+          width="2px"
+          height="20px"
+          bg="linear-gradient(to bottom, rgba(220, 38, 38, 0.5), transparent)"
+          className="fade-pulse"
         />
 
         <Box
           position="absolute"
-          bottom="0"
-          right="0"
-          width="150px"
-          height="150px"
-          bg="radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 50%)"
-          pointerEvents="none"
-          className="float-effect"
+          bottom="20px"
+          left="20px"
+          width="20px"
+          height="2px"
+          bg="linear-gradient(to right, rgba(255, 255, 255, 0.2), transparent)"
+          className="fade-pulse"
         />
       </Flex>
     </>

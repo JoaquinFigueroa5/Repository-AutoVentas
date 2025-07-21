@@ -180,7 +180,8 @@ export default function PremiumNavbar({contactRef}) {
                                         onClick={() => 
                                             {
                                                 item.submenu && handleDropdownToggle(index),
-                                                scrollTo(item.ref)
+                                                scrollTo(item.ref),
+                                                item.href
                                             }
                                         }
                                         position="relative"

@@ -28,12 +28,13 @@ import {
     WrapItem,
     Skeleton
 } from '@chakra-ui/react';
-import { ChevronLeft, ChevronRight, Eye, Heart, Calendar, Gauge, Fuel, Phone, Mail, MapPin, Maximize2, ZoomIn, ZoomOut, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Heart, Calendar, Gauge, Fuel, Phone, Mail, MapPin, Maximize2, ZoomIn, ZoomOut, X, Car, DollarSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useVehicles from '../shared/hooks/useVehicles';
 
 const MotionBox = motion(Box);
 const MotionButton = motion(Button);
+const MotionGrid = motion(Grid);
 
 export default function Carrousel() {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -81,6 +82,35 @@ export default function Carrousel() {
 
         return () => clearInterval(interval);
     }, [vehicles]);
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const cardVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut"
+            }
+        },
+        hover: {
+            y: -8,
+            transition: {
+                duration: 0.3,
+                ease: "easeOut"
+            }
+        }
+    };
 
     const nextSlide = () => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % vehicles.length);
@@ -503,91 +533,120 @@ export default function Carrousel() {
                 </HStack>
 
                 {/* Car Grid */}
-                <Grid templateColumns={gridColumns} gap={{ base: 4, md: 6 }}>
-                    {vehicles.map((car, index) => (
+                <MotionGrid
+                    templateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr']}
+                    gap={8}
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    {vehicles.map((vehicle) => (
                         <MotionBox
-                            key={car._id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1, duration: 0.5 }}
+                            key={vehicle._id}
+                            variants={cardVariants}
+                            whileHover="hover"
                             bg="gray.900"
-                            borderRadius="xl"
+                            borderRadius="2xl"
                             overflow="hidden"
-                            border="1px solid"
+                            border="1px"
                             borderColor="gray.800"
-                            _hover={{ borderColor: "red.500", transform: "translateY(-5px)" }}
-                            cursor="pointer"
-                            onClick={() => openModal(car)}
+                            _hover={{ borderColor: 'red.500' }}
+                            transition="all 0.3s ease"
+                            onClick={() => openModal(vehicle)}
                         >
-                            <Box position="relative">
+                            {/* Imagen */}
+                            <Box position="relative" overflow="hidden">
                                 <Image
-                                    src={car.images[0].url}
-                                    alt={car.name}
-                                    w="100%"
-                                    h={{ base: "180px", md: "200px" }}
+                                    src={vehicle.images[0].url}
+                                    alt={`${vehicle.name} ${vehicle.model}`}
+                                    w="full"
+                                    h="200px"
                                     objectFit="cover"
+                                    transition="transform 0.3s ease"
+                                    _hover={{ transform: 'scale(1.05)' }}
                                 />
-                                <IconButton
-                                    aria-label="Toggle favorite"
-                                    icon={
-                                        <Heart
-                                            size={20}
-                                            fill={favorites.has(car._id) ? "#ef4444" : "none"}
-                                            color={favorites.has(car._id) ? "#ef4444" : "white"}
-                                        />
-                                    }
+                                <Box
                                     position="absolute"
-                                    top={3}
-                                    right={3}
-                                    size="sm"
-                                    bg="rgba(0,0,0,0.6)"
+                                    top={4}
+                                    right={4}
+                                    bg="red.500"
                                     color="white"
+                                    px={3}
+                                    py={1}
                                     borderRadius="full"
-                                    _hover={{ bg: "red.500" }}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        toggleFavorite(car._id);
-                                    }}
-                                />
+                                    fontSize="sm"
+                                    fontWeight="bold"
+                                >
+                                    {vehicle.year}
+                                </Box>
                             </Box>
 
-                            <Box p={{ base: 4, md: 6 }}>
-                                <Heading color="white" size="md" mb={2}>
-                                    {car.name} {car.model} {car.year}
-                                </Heading>
-                                <Text color="red.400" fontSize="xl" fontWeight="bold" mb={4}>
-                                    Q{car.price.$numberDecimal}
-                                </Text>
-                                <Stack
-                                    direction={{ base: "column", sm: "row" }}
-                                    spacing={4}
-                                    mb={4}
-                                    flexWrap="wrap"
-                                >
-                                    <Text color="gray.400" fontSize="sm">
-                                        {car.year}
+                            {/* Contenido */}
+                            <VStack p={6} align="start" spacing={4}>
+                                {/* Título y precio */}
+                                <Flex justify="space-between" align="start" w="full">
+                                    <VStack align="start" spacing={1}>
+                                        <Text fontSize="xl" fontWeight="bold" color="white">
+                                            {vehicle.name} {vehicle.model} {vehicle.year}
+                                        </Text>
+                                        <Text fontSize="lg" color="gray.300">
+                                            DISPONIBLE
+                                        </Text>
+                                    </VStack>
+                                    <Text fontSize="xl" fontWeight="bold" color="red.400">
+                                        Q{vehicle.price.$numberDecimal}
                                     </Text>
-                                    <Text color="gray.400" fontSize="sm">
-                                        {car.model}
-                                    </Text>
-                                    <Text color="gray.400" fontSize="sm">
-                                        {car.status === true ? "DISPONIBLE" : "NO DISPONIBLE"}
-                                    </Text>
-                                </Stack>
+                                </Flex>
+
+                                {/* Badges */}
+                                <HStack spacing={2} flexWrap="wrap">
+                                    <Badge colorScheme="red" variant="subtle">
+                                        {vehicle.year}
+                                    </Badge>
+                                    <Badge colorScheme="gray" variant="outline">
+                                        {vehicle.name}
+                                    </Badge>
+                                </HStack>
+
+                                {/* Especificaciones */}
+                                <Grid templateColumns="1fr 1fr 1fr" gap={4} w="full">
+                                    <VStack spacing={1}>
+                                        <Calendar size={16} color="#EF4444" />
+                                        <Text fontSize="sm" color="gray.400" textAlign="center">
+                                            {vehicle.year}
+                                        </Text>
+                                    </VStack>
+                                    <VStack spacing={1}>
+                                        <Car size={16} color="#EF4444" />
+                                        <Text fontSize="sm" color="gray.400" textAlign="center">
+                                            {vehicle.model}
+                                        </Text>
+                                    </VStack>
+                                    <VStack spacing={1}>
+                                        <DollarSign size={16} color="#EF4444" />
+                                        <Text fontSize="sm" color="gray.400" textAlign="center">
+                                            Q{vehicle.price.$numberDecimal}
+                                        </Text>
+                                    </VStack>
+                                </Grid>
+
+                                {/* Botón */}
                                 <Button
-                                    size="sm"
-                                    variant="outline"
-                                    borderColor="red.500"
-                                    color="red.500"
-                                    _hover={{ bg: "red.500", color: "white" }}
-                                    w="100%"
+                                    w="full"
+                                    bg="red.500"
+                                    color="white"
+                                    _hover={{ bg: 'red.600', transform: 'translateY(-2px)' }}
+                                    _active={{ bg: 'red.700' }}
+                                    transition="all 0.3s ease"
+                                    size="lg"
+                                    borderRadius="xl"
                                 >
                                     Ver Detalles
                                 </Button>
-                            </Box>
+                            </VStack>
                         </MotionBox>
                     ))}
-                </Grid>
+                </MotionGrid>
 
                 {/* Modal Principal */}
                 <Modal isOpen={isOpen} onClose={onClose} size={modalSize}>
@@ -815,26 +874,19 @@ export default function Carrousel() {
                                 w="100%"
                             >
                                 <Button
-                                    bg="red.500"
-                                    color="white"
-                                    _hover={{ bg: "red.600" }}
-                                    size={{ base: "md", md: "lg" }}
-                                    px={8}
-                                    flex={1}
-                                >
-                                    Contactar Vendedor
-                                </Button>
-                                <Button
+                                    as='a'
                                     variant="outline"
                                     borderColor="red.500"
                                     color="red.500"
                                     _hover={{ bg: "red.500", color: "white" }}
                                     size={{ base: "md", md: "lg" }}
                                     px={8}
-                                    onClick={() => toggleFavorite(selectedCar._id)}
                                     flex={1}
+                                    href={`https://api.whatsapp.com/send?phone=50230300738&text=${encodeURIComponent(`Buenas tardes, quisiera cotizar acerca del vehículo ${selectedCar?.name} ${selectedCar?.model} ${selectedCar?.year} que vi en su sitio web.`)}`}
+                                    target='_blank'
+                                    rel='noopener noreferrer'
                                 >
-                                    {favorites.has(selectedCar?._id) ? "Remover de Favoritos" : "Agregar a Favoritos"}
+                                    Contactar Vendedor
                                 </Button>
                             </Stack>
                         </ModalFooter>

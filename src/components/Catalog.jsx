@@ -37,9 +37,15 @@ import { motion } from 'framer-motion';
 import { Search, Filter, Calendar, Zap, Fuel, Car, DollarSign, Maximize2, Gauge, Phone, Mail, MapPin, ZoomIn, ZoomOut, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import PremiumNavbar from './NavBar';
 import useVehicles from '../shared/hooks/useVehicles';
+import ContactFooter from './Footer';
 
 const MotionBox = motion(Box);
 const MotionGrid = motion(Grid);
+const MotionImage = motion(Image);
+const MotionVStack = motion(VStack);
+const MotionHStack = motion(HStack);
+const MotionButton = motion(Button);
+const MotionText = motion(Text);
 
 const CarListing = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -72,6 +78,10 @@ const CarListing = () => {
 
     // Filtrado de autos
     const filteredCars = useMemo(() => {
+        const noFilters =
+            searchTerm === '' && yearFilter === '' && typeFilter === '' && priceFilter === '';
+        if (noFilters) return vehicles;
+
         return vehicles.filter(vehicle => {
             const matchesSearch = vehicle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 vehicle.model.toLowerCase().includes(searchTerm.toLowerCase());
@@ -79,13 +89,15 @@ const CarListing = () => {
             const matchesType = typeFilter === '' || vehicle.status === typeFilter;
 
             let matchesPrice = true;
-            if (priceFilter === 'under100k') matchesPrice = vehicle.price.$numberDecimal < 100000;
-            else if (priceFilter === '100k-200k') matchesPrice = vehicle.price.$numberDecimal >= 100000 && vehicle.price.$numberDecimal < 200000;
-            else if (priceFilter === 'over200k') matchesPrice = vehicle.price.$numberDecimal >= 200000;
+            const price = vehicle?.price?.$numberDecimal;
+            if (priceFilter === 'under100k') matchesPrice = price && price < 100000;
+            else if (priceFilter === '100k-200k') matchesPrice = price && price >= 100000 && price < 200000;
+            else if (priceFilter === 'over200k') matchesPrice = price && price >= 200000;
 
             return matchesSearch && matchesYear && matchesType && matchesPrice;
         });
-    }, [searchTerm, yearFilter, priceFilter, typeFilter]);
+    }, [searchTerm, yearFilter, priceFilter, typeFilter, vehicles]);
+
 
     const openModal = (car) => {
         setSelectedCar(car);
@@ -93,28 +105,42 @@ const CarListing = () => {
         onOpenCard();
     };
 
+    // Variantes de animación mejoradas
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
             transition: {
-                staggerChildren: 0.1
+                duration: 0.3,
+                staggerChildren: 0.1, // Retraso entre cada card
+                delayChildren: 0.2 // Retraso inicial antes de que empiecen las cards
             }
         }
     };
 
     const cardVariants = {
-        hidden: { y: 20, opacity: 0 },
+        hidden: {
+            opacity: 0,
+            y: 50,
+            scale: 0.95,
+            filter: "blur(4px)"
+        },
         visible: {
-            y: 0,
             opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: "blur(0px)",
             transition: {
                 duration: 0.6,
-                ease: "easeOut"
+                ease: [0.25, 0.46, 0.45, 0.94], // Curva de easing personalizada más suave
+                type: "spring",
+                stiffness: 100,
+                damping: 15
             }
         },
         hover: {
             y: -8,
+            scale: 1.02,
             transition: {
                 duration: 0.3,
                 ease: "easeOut"
@@ -370,32 +396,48 @@ const CarListing = () => {
                         initial="hidden"
                         animate="visible"
                     >
-                        {filteredCars.map((vehicle) => (
+                        {filteredCars.map((vehicle, index) => (
                             <MotionBox
                                 key={vehicle._id}
                                 variants={cardVariants}
                                 whileHover="hover"
+                                custom={index} // Pasamos el índice para animaciones más complejas si es necesario
                                 bg="gray.900"
                                 borderRadius="2xl"
                                 overflow="hidden"
                                 border="1px"
                                 borderColor="gray.800"
-                                _hover={{ borderColor: 'red.500' }}
                                 transition="all 0.3s ease"
                                 onClick={() => openModal(vehicle)}
+                                cursor="pointer"
+                                // Añadimos una sombra sutil que se anima en hover
+                                boxShadow="0 4px 20px rgba(0, 0, 0, 0.3)"
+                                _hover={{
+                                    borderColor: 'red.500',
+                                    boxShadow: '0 8px 40px rgba(239, 68, 68, 0.2)'
+                                }}
                             >
-                                {/* Imagen */}
+                                {/* Imagen con animación mejorada */}
                                 <Box position="relative" overflow="hidden">
-                                    <Image
+                                    <MotionImage
                                         src={vehicle.images[0].url}
                                         alt={`${vehicle.name} ${vehicle.model}`}
                                         w="full"
                                         h="200px"
                                         objectFit="cover"
-                                        transition="transform 0.3s ease"
-                                        _hover={{ transform: 'scale(1.05)' }}
+                                        initial={{ scale: 1.1, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        transition={{
+                                            duration: 0.8,
+                                            delay: 0.3,
+                                            ease: "easeOut"
+                                        }}
+                                        whileHover={{
+                                            scale: 1.05,
+                                            transition: { duration: 0.3 }
+                                        }}
                                     />
-                                    <Box
+                                    <MotionBox
                                         position="absolute"
                                         top={4}
                                         right={4}
@@ -406,80 +448,122 @@ const CarListing = () => {
                                         borderRadius="full"
                                         fontSize="sm"
                                         fontWeight="bold"
+                                        initial={{ opacity: 0, x: 20, scale: 0.8 }}
+                                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                                        transition={{
+                                            duration: 0.5,
+                                            delay: 0.8,
+                                            ease: "backOut"
+                                        }}
                                     >
                                         {vehicle.year}
-                                    </Box>
+                                    </MotionBox>
                                 </Box>
 
-                                {/* Contenido */}
+                                {/* Contenido con animaciones escalonadas */}
                                 <VStack p={6} align="start" spacing={4}>
                                     {/* Título y precio */}
                                     <Flex justify="space-between" align="start" w="full">
-                                        <VStack align="start" spacing={1}>
+                                        <MotionVStack
+                                            align="start"
+                                            spacing={1}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.5, delay: 0.4 }}
+                                        >
                                             <Text fontSize="xl" fontWeight="bold" color="white">
                                                 {vehicle.name} {vehicle.model} {vehicle.year}
                                             </Text>
                                             <Text fontSize="lg" color="gray.300">
                                                 DISPONIBLE
                                             </Text>
-                                        </VStack>
-                                        <Text fontSize="xl" fontWeight="bold" color="red.400">
+                                        </MotionVStack>
+                                        <MotionText
+                                            fontSize="xl"
+                                            fontWeight="bold"
+                                            color="red.400"
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.5, delay: 0.5 }}
+                                        >
                                             Q{vehicle.price.$numberDecimal}
-                                        </Text>
+                                        </MotionText>
                                     </Flex>
 
-                                    {/* Badges */}
-                                    <HStack spacing={2} flexWrap="wrap">
+                                    {/* Badges con animación */}
+                                    <MotionHStack
+                                        spacing={2}
+                                        flexWrap="wrap"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.4, delay: 0.6 }}
+                                    >
                                         <Badge colorScheme="red" variant="subtle">
                                             {vehicle.year}
                                         </Badge>
                                         <Badge colorScheme="gray" variant="outline">
                                             {vehicle.name}
                                         </Badge>
-                                    </HStack>
+                                    </MotionHStack>
 
-                                    {/* Especificaciones */}
+                                    {/* Especificaciones con animación individual */}
                                     <Grid templateColumns="1fr 1fr 1fr" gap={4} w="full">
-                                        <VStack spacing={1}>
-                                            <Calendar size={16} color="#EF4444" />
-                                            <Text fontSize="sm" color="gray.400" textAlign="center">
-                                                {vehicle.year}
-                                            </Text>
-                                        </VStack>
-                                        <VStack spacing={1}>
-                                            <Car size={16} color="#EF4444" />
-                                            <Text fontSize="sm" color="gray.400" textAlign="center">
-                                                {vehicle.model}
-                                            </Text>
-                                        </VStack>
-                                        <VStack spacing={1}>
-                                            <DollarSign size={16} color="#EF4444" />
-                                            <Text fontSize="sm" color="gray.400" textAlign="center">
-                                                Q{vehicle.price.$numberDecimal}
-                                            </Text>
-                                        </VStack>
+                                        {[
+                                            { icon: Calendar, value: vehicle.year },
+                                            { icon: Car, value: vehicle.model },
+                                            { icon: DollarSign, value: `Q${vehicle.price.$numberDecimal}` }
+                                        ].map((spec, specIndex) => (
+                                            <MotionVStack
+                                                key={specIndex}
+                                                spacing={1}
+                                                initial={{ opacity: 0, y: 15, scale: 0.9 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                transition={{
+                                                    duration: 0.4,
+                                                    delay: 0.7 + (specIndex * 0.1),
+                                                    ease: "easeOut"
+                                                }}
+                                            >
+                                                <spec.icon size={16} color="#EF4444" />
+                                                <Text fontSize="sm" color="gray.400" textAlign="center">
+                                                    {spec.value}
+                                                </Text>
+                                            </MotionVStack>
+                                        ))}
                                     </Grid>
 
-                                    {/* Botón */}
-                                    <Button
+                                    {/* Botón con animación final */}
+                                    <MotionButton
                                         w="full"
                                         bg="red.500"
                                         color="white"
                                         _hover={{ bg: 'red.600', transform: 'translateY(-2px)' }}
                                         _active={{ bg: 'red.700' }}
-                                        transition="all 0.3s ease"
                                         size="lg"
                                         borderRadius="xl"
+                                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        transition={{
+                                            duration: 0.5,
+                                            delay: 1.0,
+                                            ease: "backOut"
+                                        }}
+                                        whileHover={{
+                                            scale: 1.02,
+                                            y: -2,
+                                            transition: { duration: 0.2 }
+                                        }}
+                                        whileTap={{ scale: 0.98 }}
                                     >
                                         Ver Detalles
-                                    </Button>
+                                    </MotionButton>
                                 </VStack>
                             </MotionBox>
                         ))}
                     </MotionGrid>
 
                     {/* Mensaje cuando no hay resultados */}
-                    {filteredCars.length === 0 && (
+                    {filteredCars?.length === 0 && (
                         <MotionBox
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -722,26 +806,19 @@ const CarListing = () => {
                                     w="100%"
                                 >
                                     <Button
-                                        bg="red.500"
-                                        color="white"
-                                        _hover={{ bg: "red.600" }}
-                                        size={{ base: "md", md: "lg" }}
-                                        px={8}
-                                        flex={1}
-                                    >
-                                        Contactar Vendedor
-                                    </Button>
-                                    <Button
+                                        as='a'
                                         variant="outline"
                                         borderColor="red.500"
                                         color="red.500"
                                         _hover={{ bg: "red.500", color: "white" }}
                                         size={{ base: "md", md: "lg" }}
                                         px={8}
-                                        onClick={() => toggleFavorite(selectedCar._id)}
                                         flex={1}
+                                        href={`https://api.whatsapp.com/send?phone=50230300738&text=${encodeURIComponent(`Buenas tardes, quisiera cotizar acerca del vehículo ${selectedCar?.name} ${selectedCar?.model} ${selectedCar?.year} que vi en su sitio web.`)}`}
+                                        target='_blank'
+                                        rel='noopener noreferrer'
                                     >
-                                        {favorites.has(selectedCar?._id) ? "Remover de Favoritos" : "Agregar a Favoritos"}
+                                        Contactar Vendedor
                                     </Button>
                                 </Stack>
                             </ModalFooter>
@@ -912,6 +989,7 @@ const CarListing = () => {
                     </Modal>
                 </Container>
             </Box>
+            <ContactFooter />
         </>
     );
 };

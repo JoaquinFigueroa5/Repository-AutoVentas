@@ -12,10 +12,11 @@ import {
     Text,
     Icon,
     HStack,
-    Divider
+    Divider,
+    Flex
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { Clock, AlertTriangle, LogIn } from 'lucide-react';
+import { Clock, AlertTriangle, LogIn, Shield } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useUserStore from './UserStore';
@@ -81,197 +82,292 @@ const UserProvider = ({ children }) => {
                 isCentered
                 closeOnOverlayClick={false}
                 closeOnEsc={false}
+                size="lg"
             >
                 <ModalOverlay
-                    bg="rgba(0, 0, 0, 0.8)"
-                    backdropFilter="blur(10px)"
+                    bg="rgba(0, 0, 0, 0.92)"
+                    backdropFilter="blur(12px)"
                 />
                 <MotionModalContent
-                    bg="black"
-                    border="2px solid rgba(218, 165, 32, 0.6)"
-                    borderRadius="2xl"
-                    boxShadow="0 0 50px rgba(218, 165, 32, 0.3)"
-                    maxW="md"
+                    background="linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%)"
+                    border="none"
+                    borderRadius="24px"
+                    boxShadow="0 25px 80px rgba(255, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)"
+                    maxW="500px"
                     mx={4}
-                    initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                    overflow="hidden"
+                    position="relative"
+                    initial={{ opacity: 0, scale: 0.8, y: 60 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.8, y: 50 }}
+                    exit={{ opacity: 0, scale: 0.8, y: 60 }}
                     transition={{
                         type: "spring",
-                        stiffness: 300,
-                        damping: 30,
-                        duration: 0.5
+                        stiffness: 280,
+                        damping: 25,
+                        duration: 0.6
                     }}
                 >
-                    {/* Decorative top border */}
+                    {/* Premium top accent */}
                     <Box
+                        position="absolute"
+                        top={0}
+                        left={0}
+                        right={0}
                         h="4px"
-                        w="100%"
-                        bgGradient="linear(to-r, rgba(218, 165, 32, 0.8), rgba(218, 165, 32, 1), rgba(218, 165, 32, 0.8))"
-                        borderTopRadius="2xl"
+                        background="linear-gradient(to right, #dc2626, #ef4444, #ffffff, #ef4444, #dc2626)"
+                        zIndex={1}
                     />
 
-                    <ModalHeader pb={2} pt={6}>
-                        <VStack spacing={4} align="center">
-                            {/* Animated Warning Icon */}
+                    {/* Luxury side accents */}
+                    <Box
+                        position="absolute"
+                        left={0}
+                        top={0}
+                        bottom={0}
+                        w="2px"
+                        background="linear-gradient(to bottom, transparent 0%, #dc267f 50%, transparent 100%)"
+                        opacity={0.6}
+                    />
+                    <Box
+                        position="absolute"
+                        right={0}
+                        top={0}
+                        bottom={0}
+                        w="2px"
+                        background="linear-gradient(to bottom, transparent 0%, #dc267f 50%, transparent 100%)"
+                        opacity={0.6}
+                    />
+
+                    <ModalHeader pt={10} pb={6}>
+                        <VStack spacing={6} align="center">
+                            {/* Premium logo/icon section */}
                             <MotionBox
-                                initial={{ scale: 0, rotate: -180 }}
+                                initial={{ scale: 0, rotate: -90 }}
                                 animate={{ scale: 1, rotate: 0 }}
-                                transition={{ delay: 0.2, duration: 0.6, type: "spring" }}
+                                transition={{ delay: 0.2, duration: 0.8, type: "spring", stiffness: 200 }}
                             >
-                                <Box
-                                    p={4}
-                                    borderRadius="full"
-                                    bg="linear-gradient(135deg, rgba(218, 165, 32, 0.2) 0%, rgba(218, 165, 32, 0.1) 100%)"
-                                    border="2px solid rgba(218, 165, 32, 0.4)"
+                                <Flex
                                     position="relative"
+                                    w="80px"
+                                    h="80px"
+                                    borderRadius="50%"
+                                    background="linear-gradient(135deg, #dc2626, #ef4444)"
+                                    align="center"
+                                    justify="center"
+                                    boxShadow="0 10px 30px rgba(255, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.2)"
+                                    _before={{
+                                        content: '""',
+                                        position: 'absolute',
+                                        top: '-4px',
+                                        left: '-4px',
+                                        right: '-4px',
+                                        bottom: '-4px',
+                                        borderRadius: '50%',
+                                        background: 'linear-gradient(45deg, rgba(255, 0, 0, 0.3), rgba(204, 0, 0, 0.3))',
+                                        zIndex: -1
+                                    }}
                                 >
                                     <Icon
                                         as={AlertTriangle}
-                                        boxSize={8}
-                                        color="rgba(218, 165, 32, 0.9)"
+                                        boxSize={10}
+                                        color="white"
+                                        filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"
                                     />
-                                    {/* Pulsing effect */}
+
+                                    {/* Rotating ring effect */}
                                     <Box
                                         position="absolute"
-                                        top="50%"
-                                        left="50%"
-                                        transform="translate(-50%, -50%)"
-                                        w="100%"
-                                        h="100%"
-                                        borderRadius="full"
-                                        border="1px solid rgba(218, 165, 32, 0.3)"
+                                        top="-6px"
+                                        left="-6px"
+                                        w="calc(100% + 12px)"
+                                        h="calc(100% + 12px)"
+                                        borderRadius="50%"
+                                        border="2px solid transparent"
+                                        borderTopColor="rgba(255, 255, 255, 0.4)"
+                                        borderRightColor="rgba(255, 255, 255, 0.1)"
                                         as={motion.div}
-                                        animate={{
-                                            scale: [1, 1.2, 1],
-                                            opacity: [0.3, 0.1, 0.3]
-                                        }}
+                                        animate={{ rotate: 360 }}
                                         transition={{
-                                            duration: 2,
+                                            duration: 3,
                                             repeat: Infinity,
-                                            ease: "easeInOut"
+                                            ease: "linear"
                                         }}
                                     />
-                                </Box>
+                                </Flex>
                             </MotionBox>
 
-                            {/* Title */}
+                            {/* Premium title section */}
                             <MotionBox
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3, duration: 0.5 }}
+                                transition={{ delay: 0.4, duration: 0.6 }}
                                 textAlign="center"
                             >
                                 <Text
-                                    fontSize="2xl"
-                                    fontWeight="700"
+                                    fontSize="3xl"
+                                    fontWeight="800"
                                     color="white"
-                                    letterSpacing="-0.02em"
-                                    mb={2}
+                                    letterSpacing="-0.03em"
+                                    mb={3}
+                                    textShadow="0 2px 4px rgba(0,0,0,0.5)"
                                 >
                                     Sesión Expirada
                                 </Text>
-                                <HStack justify="center" spacing={2} opacity={0.6}>
-                                    <Icon as={Clock} boxSize={4} color="rgba(218, 165, 32, 0.8)" />
-                                    <Divider
-                                        orientation="horizontal"
-                                        borderColor="rgba(218, 165, 32, 0.3)"
-                                        w="40px"
-                                    />
-                                    <Icon as={Clock} boxSize={4} color="rgba(218, 165, 32, 0.8)" />
-                                </HStack>
+                                <Text
+                                    fontSize="sm"
+                                    fontWeight="500"
+                                    color="rgba(255, 255, 255, 0.7)"
+                                    textTransform="uppercase"
+                                    letterSpacing="0.1em"
+                                >
+                                    ACCESO PREMIUM REQUERIDO
+                                </Text>
+
+                                {/* Decorative divider */}
+                                <Flex align="center" justify="center" mt={4}>
+                                    <Box w="30px" h="1px" background="linear-gradient(to right, transparent, #dc2626)" />
+                                    <Icon as={Shield} mx={3} color="#dc2626" boxSize={4} />
+                                    <Box w="30px" h="1px" background="linear-gradient(to left, transparent, #dc2626)" />
+                                </Flex>
                             </MotionBox>
                         </VStack>
                     </ModalHeader>
 
-                    <ModalBody py={6}>
+                    <ModalBody px={8} py={4}>
                         <MotionBox
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4, duration: 0.5 }}
+                            transition={{ delay: 0.5, duration: 0.6 }}
                         >
-                            <VStack spacing={4} textAlign="center">
+                            <VStack spacing={6}>
                                 <Text
-                                    color="rgba(255, 255, 255, 0.9)"
-                                    fontSize="md"
-                                    lineHeight="1.6"
+                                    color="rgba(255, 255, 255, 0.95)"
+                                    fontSize="lg"
+                                    fontWeight="500"
+                                    lineHeight="1.7"
+                                    textAlign="center"
                                 >
-                                    Tu sesión ha expirado por seguridad.
-                                </Text>
-                                <Text
-                                    color="rgba(255, 255, 255, 0.6)"
-                                    fontSize="sm"
-                                    lineHeight="1.5"
-                                >
-                                    Por favor, inicia sesión nuevamente para continuar usando la aplicación.
+                                    Tu sesión ha expirado por medidas de seguridad premium.
                                 </Text>
 
-                                {/* Security notice */}
-                                <Box
-                                    bg="rgba(218, 165, 32, 0.05)"
-                                    border="1px solid rgba(218, 165, 32, 0.2)"
-                                    borderRadius="lg"
-                                    p={3}
-                                    w="100%"
-                                    mt={4}
+                                <Text
+                                    color="rgba(255, 255, 255, 0.65)"
+                                    fontSize="md"
+                                    lineHeight="1.6"
+                                    textAlign="center"
                                 >
-                                    <HStack spacing={3}>
-                                        <Icon
-                                            as={AlertTriangle}
-                                            color="rgba(218, 165, 32, 0.8)"
-                                            boxSize={4}
+                                    Inicia sesión nuevamente para acceder a tu experiencia exclusiva.
+                                </Text>
+
+                                {/* Luxury security card */}
+                                <Box
+                                    w="100%"
+                                    background="linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(255, 0, 0, 0.05))"
+                                    border="1px solid"
+                                    borderColor="rgba(255, 0, 0, 0.3)"
+                                    borderRadius="16px"
+                                    p={5}
+                                    position="relative"
+                                    overflow="hidden"
+                                    _before={{
+                                        content: '""',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: '1px',
+                                        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)'
+                                    }}
+                                >
+                                    <HStack spacing={4}>
+                                        <Flex
+                                            w="40px"
+                                            h="40px"
+                                            borderRadius="12px"
+                                            bg="rgba(255, 0, 0, 0.2)"
+                                            align="center"
+                                            justify="center"
                                             flexShrink={0}
-                                        />
-                                        <Text
-                                            fontSize="xs"
-                                            color="rgba(255, 255, 255, 0.7)"
-                                            lineHeight="1.4"
                                         >
-                                            Por tu seguridad, las sesiones expiran automáticamente después de un período de inactividad.
-                                        </Text>
+                                            <Icon
+                                                as={Shield}
+                                                color="#dc2626"
+                                                boxSize={5}
+                                            />
+                                        </Flex>
+                                        <Box flex={1}>
+                                            <Text
+                                                fontSize="sm"
+                                                fontWeight="600"
+                                                color="rgba(255, 255, 255, 0.9)"
+                                                mb={1}
+                                            >
+                                                Seguridad Premium
+                                            </Text>
+                                            <Text
+                                                fontSize="xs"
+                                                color="rgba(255, 255, 255, 0.6)"
+                                                lineHeight="1.5"
+                                            >
+                                                Las sesiones expiran automáticamente para proteger tu cuenta y datos.
+                                            </Text>
+                                        </Box>
                                     </HStack>
                                 </Box>
                             </VStack>
                         </MotionBox>
                     </ModalBody>
 
-                    <ModalFooter pt={2} pb={6}>
+                    <ModalFooter px={8} pb={8} pt={4}>
                         <MotionBox
                             w="100%"
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5, duration: 0.5 }}
+                            transition={{ delay: 0.6, duration: 0.6 }}
                         >
                             <MotionButton
                                 onClick={handleModalClose}
                                 size="lg"
                                 w="100%"
-                                h="52px"
-                                borderRadius="xl"
-                                bg="linear-gradient(135deg, rgba(218, 165, 32, 0.9) 0%, rgba(218, 165, 32, 0.7) 100%)"
-                                color="black"
-                                fontWeight="600"
-                                fontSize="md"
-                                border="1px solid rgba(218, 165, 32, 0.3)"
+                                h="56px"
+                                borderRadius="16px"
+                                background="linear-gradient(135deg, #dc2626, #ef4444)"
+                                color="white"
+                                fontWeight="700"
+                                fontSize="lg"
+                                letterSpacing="0.02em"
+                                border="1px solid rgba(255, 255, 255, 0.1)"
                                 leftIcon={<Icon as={LogIn} boxSize={5} />}
+                                boxShadow="0 8px 32px rgba(255, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)"
                                 _hover={{
-                                    bg: "linear-gradient(135deg, rgba(218, 165, 32, 1) 0%, rgba(218, 165, 32, 0.8) 100%)",
-                                    transform: "translateY(-1px)",
-                                    boxShadow: "0 6px 20px rgba(218, 165, 32, 0.4)"
+                                    background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "0 12px 40px rgba(255, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3)"
                                 }}
                                 _active={{
-                                    bg: "linear-gradient(135deg, rgba(218, 165, 32, 0.8) 0%, rgba(218, 165, 32, 0.6) 100%)",
-                                    transform: "translateY(0)"
+                                    background: "linear-gradient(135deg, #b91c1c, #dc2626)",
+                                    transform: "translateY(-1px)"
                                 }}
                                 initial={{ scale: 1 }}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                transition="all 0.2s ease"
+                                transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
                             >
-                                Ir al Login
+                                ACCEDER AL SISTEMA
                             </MotionButton>
                         </MotionBox>
                     </ModalFooter>
+
+                    {/* Bottom accent line */}
+                    <Box
+                        position="absolute"
+                        bottom={0}
+                        left={0}
+                        right={0}
+                        h="2px"
+                        background="linear-gradient(to right, transparent, #dc2626, transparent)"
+                        opacity={0.5}
+                    />
                 </MotionModalContent>
             </Modal>
         </>
