@@ -207,22 +207,17 @@ const VehicleDeleteModal = ({ isOpen, onOpen, onClose, selectedCar}) => {
 
                                             <HStack justify="space-between">
                                                 <Text color="gray.600" fontSize="sm">Año:</Text>
-                                                <Badge colorScheme="gray" variant="subtle">
+                                                <Text fontWeight="bold" color="red.500">
                                                     {selectedCar.year}
-                                                </Badge>
+                                                </Text>
                                             </HStack>
 
                                             <HStack justify="space-between">
                                                 <Text color="gray.600" fontSize="sm">Precio:</Text>
                                                 <Text fontWeight="bold" color="green.600" fontSize="lg">
-                                                    {selectedCar.price.$numberDecimal}
+                                                    Q{selectedCar.price.$numberDecimal}
                                                 </Text>
                                             </HStack>
-
-                                            {/* <HStack justify="space-between">
-                                                <Text color="gray.600" fontSize="sm">Color:</Text>
-                                                <Text color="gray.800">{vehicleData.color}</Text>
-                                            </HStack> */}
 
                                             <Divider my={1} />
 

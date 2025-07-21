@@ -49,7 +49,7 @@ export default function Carrousel() {
     const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { vehicles, fetchVehiclesRecents, loading } = useVehicles();
+    const { vehicles, fetchVehicles, loading } = useVehicles();
 
     // Responsive values
     const containerMaxW = useBreakpointValue({ base: "100%", md: "7xl" });
@@ -68,7 +68,7 @@ export default function Carrousel() {
     });
 
     useEffect(() => {
-        fetchVehiclesRecents();
+        fetchVehicles();
     }, [])
 
     useEffect(() => {
