@@ -73,18 +73,7 @@ export default function PremiumNavbar({contactRef}) {
         {
             label: 'Servicios',
             icon: Shield,
-            submenu: [
-                { label: 'Financiamiento', icon: Calculator },
-                { label: 'Seguro', icon: Shield },
-                { label: 'Mantenimiento', icon: Settings },
-                { label: 'Garantía', icon: Award },
-                { label: 'Evaluación', icon: FileText }
-            ]
-        },
-        {
-            label: 'Favoritos',
-            icon: Heart,
-            badge: 3
+            href: '/services'
         },
         {
             label: 'Contacto',
@@ -368,39 +357,12 @@ export default function PremiumNavbar({contactRef}) {
 
                     <DrawerBody>
                         <VStack spacing={6} align="stretch" py={4}>
-                            {/* Mobile Search */}
-                            {/* <InputGroup>
-                                <Input
-                                    placeholder="Buscar vehículos..."
-                                    bg="rgba(255,255,255,0.1)"
-                                    border="1px solid"
-                                    borderColor="rgba(255,255,255,0.2)"
-                                    color="white"
-                                    _placeholder={{ color: "gray.400" }}
-                                    _focus={{
-                                        borderColor: "red.500",
-                                        boxShadow: "0 0 0 1px #ef4444"
-                                    }}
-                                    borderRadius="lg"
-                                />
-                                <InputRightElement>
-                                    <IconButton
-                                        aria-label="Search"
-                                        icon={<Search size={18} />}
-                                        size="sm"
-                                        bg="red.500"
-                                        color="white"
-                                        borderRadius="md"
-                                        _hover={{ bg: "red.600" }}
-                                    />
-                                </InputRightElement>
-                            </InputGroup> */}
-
                             {/* Mobile Navigation */}
                             <VStack spacing={4} align="stretch">
                                 {navItems.map((item, index) => (
                                     <Box key={index}>
                                         <MotionButton
+                                            as='a'
                                             variant="ghost"
                                             color="white"
                                             size="lg"
@@ -415,6 +377,7 @@ export default function PremiumNavbar({contactRef}) {
                                             onClick={() => item.submenu && handleDropdownToggle(index)}
                                             whileHover={{ x: 5 }}
                                             position="relative"
+                                            href={item.href}
                                         >
                                             {item.label}
                                             {item.badge && (

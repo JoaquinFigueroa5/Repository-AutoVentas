@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     Box,
     Grid,
@@ -38,7 +38,18 @@ import {
     DrawerContent,
     DrawerCloseButton,
     DrawerHeader,
-    DrawerBody
+    DrawerBody,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    Menu,
+    InputGroup,
+    Select,
+    InputLeftElement,
+    InputRightElement,
+    Badge,
+    Input,
+
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -62,7 +73,8 @@ import {
     ZoomOut,
     X,
     MenuIcon,
-    Trash2
+    Trash2,
+    Search
 } from 'lucide-react';
 import useVehicles from '../shared/hooks/useVehicles';
 import useUserStore from '../context/UserStore';
@@ -74,8 +86,16 @@ import ContactFooter from '../components/Footer';
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
 const MotionFlex = motion(Flex);
+const MotionInputGroup = motion(InputGroup);
+const MotionSelect = motion(Select);
+
 
 const AutoSalesDashboard = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [brandFilter, setBrandFilter] = useState('');
+    const [yearFilter, setYearFilter] = useState('');
+    const [priceFilter, setPriceFilter] = useState('');
+    const [typeFilter, setTypeFilter] = useState('');
     const [selectedCar, setSelectedCar] = useState(null);
     const [favorites, setFavorites] = useState(new Set());
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -86,6 +106,8 @@ const AutoSalesDashboard = () => {
     const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
+
+
 
     const { vehicles, fetchVehiclesRecents, loading, error, deleteVehicles } = useVehicles();
     const { user, fetchUser } = useUserStore();
@@ -99,7 +121,27 @@ const AutoSalesDashboard = () => {
         fetchVehiclesRecents();
     }, [])
 
+    const filteredCars = useMemo(() => {
+        const noFilters =
+            searchTerm === '' && yearFilter === '' && typeFilter === '' && priceFilter === '' && brandFilter === '';
+        if (noFilters) return vehicles;
 
+        return vehicles.filter(vehicle => {
+            const matchesSearch = vehicle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                vehicle.model.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesYear = yearFilter === '' || vehicle.year.toString() === yearFilter;
+            const matchesType = typeFilter === '' || vehicle.model === typeFilter;
+            const matchesBrand = brandFilter === '' || vehicle.name === brandFilter;
+
+            let matchesPrice = true;
+            const price = vehicle?.price?.$numberDecimal;
+            if (priceFilter === 'under100k') matchesPrice = price && price < 100000;
+            else if (priceFilter === '100k-200k') matchesPrice = price && price >= 100000 && price < 200000;
+            else if (priceFilter === 'over200k') matchesPrice = price && price >= 200000;
+
+            return matchesSearch && matchesYear && matchesType && matchesPrice && matchesBrand;
+        });
+    }, [searchTerm, yearFilter, priceFilter, typeFilter, brandFilter, vehicles]);
 
     const openModal = (car) => {
         setSelectedCar(car);
@@ -289,7 +331,7 @@ const AutoSalesDashboard = () => {
         {
             key: 'vehiculos',
             label: 'Vehículos Disponibles',
-            value: vehicles.length,
+            value: filteredCars.length,
             icon: Car,
             gradient: 'linear(135deg, red.600, red.700)'
         },
@@ -604,12 +646,359 @@ const AutoSalesDashboard = () => {
                             </Box>
                         </MotionFlex>
                     </MotionBox>
+                    <MotionBox
+                        layout
+                        w="full"
+                        bg="linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 100%)"
+                        p={8}
+                        borderRadius="3xl"
+                        border="2px"
+                        borderColor="red.600"
+                        boxShadow="0 25px 50px -12px rgba(239, 68, 68, 0.25)"
+                        position="relative"
+                        overflow="hidden"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        _before={{
+                            content: '""',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '2px',
+                            background: 'linear-gradient(90deg, transparent, red.500, transparent)',
+                            animation: 'shimmer 3s infinite'
+                        }}
+                    >
+                        {/* Efectos de fondo decorativos */}
+                        <Box
+                            position="absolute"
+                            top="-50%"
+                            right="-50%"
+                            width="200%"
+                            height="200%"
+                            background="radial-gradient(circle, rgba(239, 68, 68, 0.03) 0%, transparent 70%)"
+                            pointerEvents="none"
+                        />
+
+                        <VStack spacing={6} position="relative" zIndex={2}>
+                            {/* Header del buscador */}
+                            <MotionBox
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.2, duration: 0.5 }}
+                                w="full"
+                                textAlign="center"
+                            >
+                                <HStack justify="center" spacing={3} mb={2}>
+                                    <Box
+                                        p={2}
+                                        bg="red.600"
+                                        borderRadius="xl"
+                                        boxShadow="0 0 20px rgba(239, 68, 68, 0.4)"
+                                    >
+                                        <Search color="white" size={20} />
+                                    </Box>
+                                    <Text
+                                        fontSize="xl"
+                                        fontWeight="bold"
+                                        color="white"
+                                        textShadow="0 2px 4px rgba(0,0,0,0.5)"
+                                    >
+                                        Buscar Vehículos
+                                    </Text>
+                                </HStack>
+                                <Text fontSize="sm" color="gray.400">
+                                    Encuentra el vehículo perfecto para ti
+                                </Text>
+                            </MotionBox>
+
+                            {/* Barra de búsqueda principal */}
+                            <MotionInputGroup
+                                size="lg"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.3, duration: 0.5 }}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <InputLeftElement pointerEvents="none" pl={4}>
+                                    <motion.div
+                                        animate={{
+                                            color: searchTerm ? "#ef4444" : "#9ca3af",
+                                            scale: searchTerm ? 1.1 : 1
+                                        }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <Search size={22} />
+                                    </motion.div>
+                                </InputLeftElement>
+                                <Input
+                                    placeholder="Buscar marca, modelo o características..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    bg="rgba(0, 0, 0, 0.7)"
+                                    backdropFilter="blur(10px)"
+                                    border="2px"
+                                    borderColor="gray.700"
+                                    color="white"
+                                    fontSize="lg"
+                                    h="60px"
+                                    pl={16}
+                                    pr={searchTerm ? 16 : 6}
+                                    borderRadius="2xl"
+                                    _placeholder={{
+                                        color: 'gray.500',
+                                        fontSize: 'md'
+                                    }}
+                                    _hover={{
+                                        borderColor: 'red.400',
+                                        boxShadow: '0 0 0 1px rgba(239, 68, 68, 0.3)'
+                                    }}
+                                    _focus={{
+                                        borderColor: 'red.500',
+                                        boxShadow: '0 0 0 3px rgba(239, 68, 68, 0.2), 0 0 20px rgba(239, 68, 68, 0.1)',
+                                        bg: 'rgba(0, 0, 0, 0.9)'
+                                    }}
+                                    transition="all 0.3s ease"
+                                />
+                                {searchTerm && (
+                                    <InputRightElement pr={4} h="full">
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0 }}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
+                                        >
+                                            <IconButton
+                                                size="sm"
+                                                aria-label="Limpiar búsqueda"
+                                                icon={<X size={16} />}
+                                                onClick={() => setSearchTerm('')}
+                                                bg="gray.700"
+                                                color="gray.300"
+                                                borderRadius="full"
+                                                _hover={{
+                                                    bg: 'red.600',
+                                                    color: 'white',
+                                                    transform: 'rotate(90deg)'
+                                                }}
+                                                transition="all 0.2s ease"
+                                            />
+                                        </motion.div>
+                                    </InputRightElement>
+                                )}
+                            </MotionInputGroup>
+
+                            {/* Filtros con diseño mejorado */}
+                            <MotionBox
+                                w="full"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4, duration: 0.5 }}
+                            >
+                                <HStack spacing={2} mb={4} align="center">
+                                    <Filter size={18} color="#ef4444" />
+                                    <Text fontSize="md" fontWeight="semibold" color="white">
+                                        Filtros Avanzados
+                                    </Text>
+                                    <Box flex={1} h="1px" bg="gray.700" />
+                                </HStack>
+
+                                <Grid
+                                    templateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr']}
+                                    gap={4}
+                                    w="full"
+                                >
+                                    {/* Filtro de Marca */}
+                                    <MotionSelect
+                                        placeholder="🏷️ Seleccionar Marca"
+                                        value={brandFilter}
+                                        onChange={(e) => setBrandFilter(e.target.value)}
+                                        bg="rgba(0, 0, 0, 0.7)"
+                                        backdropFilter="blur(10px)"
+                                        border="2px"
+                                        borderColor="gray.700"
+                                        color="white"
+                                        h="50px"
+                                        borderRadius="xl"
+                                        fontSize="md"
+                                        whileHover={{ scale: 1.02 }}
+                                        _hover={{
+                                            borderColor: 'red.400',
+                                            boxShadow: '0 0 0 1px rgba(239, 68, 68, 0.2)'
+                                        }}
+                                        _focus={{
+                                            borderColor: 'red.500',
+                                            boxShadow: '0 0 0 2px rgba(239, 68, 68, 0.3)'
+                                        }}
+                                        transition="all 0.2s ease"
+                                    >
+                                        {[...new Set(vehicles.map(vehicle => vehicle.name))].map(name => (
+                                            <option key={name} value={name} style={{
+                                                background: '#1a1a1a',
+                                                color: 'white',
+                                                padding: '10px'
+                                            }}>
+                                                {name}
+                                            </option>
+                                        ))}
+                                    </MotionSelect>
+
+                                    {/* Filtro de Año */}
+                                    <MotionSelect
+                                        placeholder="📅 Seleccionar Año"
+                                        value={yearFilter}
+                                        onChange={(e) => setYearFilter(e.target.value)}
+                                        bg="rgba(0, 0, 0, 0.7)"
+                                        backdropFilter="blur(10px)"
+                                        border="2px"
+                                        borderColor="gray.700"
+                                        color="white"
+                                        h="50px"
+                                        borderRadius="xl"
+                                        fontSize="md"
+                                        whileHover={{ scale: 1.02 }}
+                                        _hover={{
+                                            borderColor: 'red.400',
+                                            boxShadow: '0 0 0 1px rgba(239, 68, 68, 0.2)'
+                                        }}
+                                        _focus={{
+                                            borderColor: 'red.500',
+                                            boxShadow: '0 0 0 2px rgba(239, 68, 68, 0.3)'
+                                        }}
+                                        transition="all 0.2s ease"
+                                    >
+                                        {[...new Set(vehicles.map(vehicle => vehicle.year))].sort().reverse().map(year => (
+                                            <option key={year} value={year} style={{
+                                                background: '#1a1a1a',
+                                                color: 'white',
+                                                padding: '10px'
+                                            }}>
+                                                {year}
+                                            </option>
+                                        ))}
+                                    </MotionSelect>
+
+                                    {/* Filtro de Precio */}
+                                    <MotionSelect
+                                        placeholder="💰 Rango de Precio"
+                                        value={priceFilter}
+                                        onChange={(e) => setPriceFilter(e.target.value)}
+                                        bg="rgba(0, 0, 0, 0.7)"
+                                        backdropFilter="blur(10px)"
+                                        border="2px"
+                                        borderColor="gray.700"
+                                        color="white"
+                                        h="50px"
+                                        borderRadius="xl"
+                                        fontSize="md"
+                                        whileHover={{ scale: 1.02 }}
+                                        _hover={{
+                                            borderColor: 'red.400',
+                                            boxShadow: '0 0 0 1px rgba(239, 68, 68, 0.2)'
+                                        }}
+                                        _focus={{
+                                            borderColor: 'red.500',
+                                            boxShadow: '0 0 0 2px rgba(239, 68, 68, 0.3)'
+                                        }}
+                                        transition="all 0.2s ease"
+                                    >
+                                        <option value="under100k" style={{
+                                            background: '#1a1a1a',
+                                            color: 'white',
+                                            padding: '10px'
+                                        }}>
+                                            Menos de Q100K
+                                        </option>
+                                        <option value="100k-200k" style={{
+                                            background: '#1a1a1a',
+                                            color: 'white',
+                                            padding: '10px'
+                                        }}>
+                                            Q100K - Q200K
+                                        </option>
+                                        <option value="over200k" style={{
+                                            background: '#1a1a1a',
+                                            color: 'white',
+                                            padding: '10px'
+                                        }}>
+                                            Más de Q200K
+                                        </option>
+                                    </MotionSelect>
+                                </Grid>
+                            </MotionBox>
+
+                            {/* Indicador de filtros activos */}
+                            {(brandFilter || yearFilter || priceFilter || searchTerm) && (
+                                <MotionBox
+                                    w="full"
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <HStack spacing={2} flexWrap="wrap">
+                                        <Text fontSize="xs" color="gray.400">Filtros activos:</Text>
+                                        {searchTerm && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0 }}
+                                            >
+                                                <Badge colorScheme="red" variant="subtle" borderRadius="full" px={3} py={1}>
+                                                    Búsqueda: {searchTerm}
+                                                </Badge>
+                                            </motion.div>
+                                        )}
+                                        {brandFilter && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0 }}
+                                            >
+                                                <Badge colorScheme="red" variant="subtle" borderRadius="full" px={3} py={1}>
+                                                    Marca: {brandFilter}
+                                                </Badge>
+                                            </motion.div>
+                                        )}
+                                        {yearFilter && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0 }}
+                                            >
+                                                <Badge colorScheme="red" variant="subtle" borderRadius="full" px={3} py={1}>
+                                                    Año: {yearFilter}
+                                                </Badge>
+                                            </motion.div>
+                                        )}
+                                        {priceFilter && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0 }}
+                                            >
+                                                <Badge colorScheme="red" variant="subtle" borderRadius="full" px={3} py={1}>
+                                                    Precio: {priceFilter === 'under100k' ? 'Menos de Q100K' :
+                                                        priceFilter === '100k-200k' ? 'Q100K - Q200K' : 'Más de Q200K'}
+                                                </Badge>
+                                            </motion.div>
+                                        )}
+                                    </HStack>
+                                </MotionBox>
+                            )}
+                        </VStack>
+                    </MotionBox>
 
                     {/* Métricas Principales Responsivas */}
                     <Grid
                         templateColumns={gridColumns}
                         gap={gridGap}
                         mb={{ base: 8, md: 10, lg: 12 }}
+                        pt={10}
                     >
                         {metrics.map((metric, index) => (
                             <MotionCard
@@ -620,8 +1009,6 @@ const AutoSalesDashboard = () => {
                                 borderRadius={{ base: "xl", md: "2xl" }}
                                 overflow="hidden"
                                 position="relative"
-                                onMouseEnter={() => setHoveredCard?.(metric.key)}
-                                onMouseLeave={() => setHoveredCard?.(null)}
                                 whileHover="hover"
                                 variants={cardHoverVariants}
                                 boxShadow="0 8px 32px rgba(0, 0, 0, 0.3)"
@@ -751,7 +1138,7 @@ const AutoSalesDashboard = () => {
                                 </CardHeader>
                                 <CardBody pt={0} p={8}>
                                     <Grid templateColumns={gridColumns} gap={{ base: 4, md: 6 }}>
-                                        {vehicles.map((car, index) => (
+                                        {filteredCars.map((car, index) => (
                                             <MotionBox
                                                 key={car._id}
                                                 initial={{ opacity: 0, y: 20 }}
@@ -1054,29 +1441,7 @@ const AutoSalesDashboard = () => {
                                                 </Grid>
                                             </ModalBody>
 
-                                            <ModalFooter>
-                                                <Stack
-                                                    direction={{ base: "column", sm: "row" }}
-                                                    spacing={4}
-                                                    w="100%"
-                                                >
-                                                    <Button
-                                                        as='a'
-                                                        variant="outline"
-                                                        borderColor="red.500"
-                                                        color="red.500"
-                                                        _hover={{ bg: "red.500", color: "white" }}
-                                                        size={{ base: "md", md: "lg" }}
-                                                        px={8}
-                                                        flex={1}
-                                                        href={`https://api.whatsapp.com/send?phone=50230300738&text=${encodeURIComponent(`Buenas tardes, quisiera cotizar acerca del vehículo ${selectedCar?.name} ${selectedCar?.model} ${selectedCar?.year} que vi en su sitio web.`)}`}
-                                                        target='_blank'
-                                                        rel='noopener noreferrer'
-                                                    >
-                                                        Contactar Vendedor
-                                                    </Button>
-                                                </Stack>
-                                            </ModalFooter>
+
                                         </ModalContent>
                                     </Modal>
 
@@ -1250,7 +1615,6 @@ const AutoSalesDashboard = () => {
             </Box>
             <ModalAddVehicle isOpen={isOpenModal} onOpen={onOpenModal} onClose={onCloseModal} />
             <VehicleDeleteModal isOpen={isOpenDelete} onOpen={onOpenDelete} onClose={onCloseDelete} selectedCar={selectedCar} />
-            {/* <ContactFooter /> */}
         </>
     );
 };

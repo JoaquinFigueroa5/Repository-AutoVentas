@@ -4,7 +4,8 @@ import {
     getVehicles as getVehiclesRequest, 
     addVehicles as addVehiclesRequest, 
     getVehiclesRecents as getVehiclesRecentsRequest,
-    deleteVehicles as deleteVehiclesRequest
+    deleteVehicles as deleteVehiclesRequest,
+    editVehicles as editVehiclesRequest
 } from "../../services";
 
 const useVehicles = () => {
@@ -113,6 +114,41 @@ const useVehicles = () => {
         }
     }
 
+    const editVehicles = async(id, data) => {
+        setLoading(true);
+        try {
+            const response = editVehiclesRequest(id, data);
+
+            if (response.error) {
+                throw new Error(response.msg);
+            }
+
+            toast({
+                title: "Vehículo editado",
+                description: "El vehículo fue editado correctamente.",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right",
+            });
+
+            await fetchVehiclesRecents();
+
+            return response;
+
+        } catch (error) {
+            setError(error.response?.data?.msg || 'Error to delete vehicle');
+            toast({
+                title: "Vehículo no ha podido ser editado",
+                description: "El vehículo no fue editado correctamente.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right",
+            });
+        }
+    }
+
     useEffect(() => {
         fetchVehicles();
     }, []);
@@ -122,7 +158,7 @@ const useVehicles = () => {
     }, []);
 
 
-    return { vehicles, fetchVehicles, addVehicles, loading, error, fetchVehiclesRecents, deleteVehicles };
+    return { vehicles, fetchVehicles, addVehicles, loading, error, fetchVehiclesRecents, deleteVehicles, editVehicles };
 };
 
 export default useVehicles;

@@ -35,7 +35,6 @@ const VehicleDeleteModal = ({ isOpen, onOpen, onClose, selectedCar}) => {
     const handleDelete = async (id) => {
         await deleteVehicles(id)
         onClose();
-        location.reload();
     };
 
     const modalVariants = {

@@ -48,7 +48,7 @@ const ContactFooter = ({ contactRef }) => {
         name: '',
         email: '',
         phone: '',
-        company: '',
+        apellido: '',
         message: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,7 +82,7 @@ const ContactFooter = ({ contactRef }) => {
             name: '',
             email: '',
             phone: '',
-            company: '',
+            apellido: '',
             message: ''
         });
         setIsSubmitting(false);
@@ -456,12 +456,12 @@ const ContactFooter = ({ contactRef }) => {
                                     />
                                 </FormControl>
                                 <FormControl>
-                                    <FormLabel>Empresa</FormLabel>
+                                    <FormLabel>Apellido</FormLabel>
                                     <Input
-                                        name="company"
-                                        value={formData.company}
+                                        name="apellido"
+                                        value={formData.apellido}
                                         onChange={handleInputChange}
-                                        placeholder="Tu empresa"
+                                        placeholder="Tu apellido"
                                         bg="gray.800"
                                         border="1px solid"
                                         borderColor="gray.600"

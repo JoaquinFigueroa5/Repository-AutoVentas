@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const apiClient = axios.create({
     baseURL: 'http://127.0.0.1:3000/AutoVentas/v1',
-    timeout: 50000
+    timeout: 5000000
 });
 
 apiClient.interceptors.request.use(
@@ -76,6 +76,18 @@ export const addVehicles = async(data) => {
 export const deleteVehicles = async(id) => {
     try {
         return await apiClient.delete(`/vehicles/${id}`)
+    } catch (error) {
+        const msg = error.response?.data?.msg || error.response?.data || 'Error'
+        return {
+            error: true,
+            msg
+        }
+    }
+}
+
+export const editVehicles = async(id, data) => {
+    try {
+        return await apiClient.put(`/vehicles/${id}`, data)
     } catch (error) {
         const msg = error.response?.data?.msg || error.response?.data || 'Error'
         return {
