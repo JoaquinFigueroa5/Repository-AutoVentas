@@ -16,7 +16,7 @@ const useUserStore = create((set) => ({
             return;
         }
 
-        axios.get('http://localhost:3000/AutoVentas/v1/auth/profile', {
+        axios.get('https://repository-backendautoventas.onrender.com/AutoVentas/v1/auth/profile', {
             headers: { 'x-token': token}
         }).then((res) => {
             set({ user: res.data.user });

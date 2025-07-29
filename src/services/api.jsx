@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:3000/AutoVentas/v1',
+    baseURL: 'https://repository-backendautoventas.onrender.com/AutoVentas/v1',
     timeout: 5000000
 });
 
