@@ -26,7 +26,8 @@ import {
     Stack,
     Wrap,
     WrapItem,
-    Skeleton
+    Skeleton,
+    Circle
 } from '@chakra-ui/react';
 import { ChevronLeft, ChevronRight, Eye, Heart, Calendar, Gauge, Fuel, Phone, Mail, MapPin, Maximize2, ZoomIn, ZoomOut, X, Car, DollarSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -49,7 +50,7 @@ export default function Carrousel() {
     const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { vehicles, fetchVehicles, loading } = useVehicles();
+    const { vehicles, fetchVehiclesDashboard, loading } = useVehicles();
 
     // Responsive values
     const containerMaxW = useBreakpointValue({ base: "100%", md: "7xl" });
@@ -68,7 +69,7 @@ export default function Carrousel() {
     });
 
     useEffect(() => {
-        fetchVehicles();
+        fetchVehiclesDashboard();
     }, [])
 
     useEffect(() => {
@@ -531,7 +532,17 @@ export default function Carrousel() {
                         />
                     ))}
                 </HStack>
-
+                <HStack spacing={3} pb={5} >
+                    <Circle size="12px" bg="red.500" />
+                    <Text
+                        color="white"
+                        fontSize="2xl"
+                        fontWeight="800"
+                        letterSpacing="-0.01em"
+                    >
+                        Agregados recientemente
+                    </Text>
+                </HStack>
                 {/* Car Grid */}
                 <MotionGrid
                     templateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr']}

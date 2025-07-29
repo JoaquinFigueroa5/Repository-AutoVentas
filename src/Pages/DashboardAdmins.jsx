@@ -135,7 +135,9 @@ const AutoSalesDashboard = () => {
 
             let matchesPrice = true;
             const price = vehicle?.price?.$numberDecimal;
-            if (priceFilter === 'under100k') matchesPrice = price && price < 100000;
+            if (priceFilter === 'under25k') matchesPrice = price && price < 25000;
+            else if (priceFilter === '25k-50k') matchesPrice = price && price >= 25000 && price <= 50000;
+            else if (priceFilter === '50k-100k') matchesPrice = price && price >= 50000 && price <= 100000;
             else if (priceFilter === '100k-200k') matchesPrice = price && price >= 100000 && price < 200000;
             else if (priceFilter === 'over200k') matchesPrice = price && price >= 200000;
 
@@ -906,12 +908,26 @@ const AutoSalesDashboard = () => {
                                         }}
                                         transition="all 0.2s ease"
                                     >
-                                        <option value="under100k" style={{
+                                        <option value="under25k" style={{
                                             background: '#1a1a1a',
                                             color: 'white',
                                             padding: '10px'
                                         }}>
-                                            Menos de Q100K
+                                            Menos de Q25K
+                                        </option>
+                                        <option value="25k-50k" style={{
+                                            background: '#1a1a1a',
+                                            color: 'white',
+                                            padding: '10px'
+                                        }}>
+                                            Q25k-Q50k
+                                        </option>
+                                        <option value="50k-100k" style={{
+                                            background: '#1a1a1a',
+                                            color: 'white',
+                                            padding: '10px'
+                                        }}>
+                                            Q50k-Q100k
                                         </option>
                                         <option value="100k-200k" style={{
                                             background: '#1a1a1a',

@@ -56,14 +56,16 @@ const MotionFlex = motion(Flex);
 const MotionButton = motion(Button);
 
 
-export default function PremiumNavbar({contactRef}) {
+export default function PremiumNavbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [searchValue, setSearchValue] = useState('');
     const [notifications, setNotifications] = useState(5);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { user, fetchUser } = useUserStore();
-    
+
+    const contactRef = useRef(null);
+
     const navItems = [
         {
             label: 'Vehículos',
@@ -93,6 +95,9 @@ export default function PremiumNavbar({contactRef}) {
     const handleDropdownToggle = (index) => {
         setActiveDropdown(activeDropdown === index ? null : index);
     };
+
+    const scrollTo = (ref) =>
+        ref?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
     return (
         <>
@@ -166,12 +171,11 @@ export default function PremiumNavbar({contactRef}) {
                                             color: "red.400",
                                             transform: "translateY(-2px)"
                                         }}
-                                        onClick={() => 
-                                            {
-                                                item.submenu && handleDropdownToggle(index),
+                                        onClick={() => {
+                                            item.submenu && handleDropdownToggle(index),
                                                 scrollTo(item.ref),
                                                 item.href
-                                            }
+                                        }
                                         }
                                         position="relative"
                                         whileHover={{ scale: 1.05 }}

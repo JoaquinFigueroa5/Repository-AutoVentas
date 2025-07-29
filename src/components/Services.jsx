@@ -55,7 +55,7 @@ const Services = () => {
             icon: Droplets,
             title: "Lavado Premium",
             description: "Limpieza profunda con productos biodegradables de última generación",
-            price: "$25",
+            price: "Q25",
             features: ["Shampoo premium", "Encerado básico", "Limpieza de llantas"],
             duration: "30 min",
             popular: false
@@ -64,7 +64,7 @@ const Services = () => {
             icon: Shield,
             title: "Detallado Elite",
             description: "Protección completa con tecnología nanoceramic y acabado espejo",
-            price: "$45",
+            price: "Q45",
             features: ["Lavado premium", "Protección UV", "Encerado ceramico", "Interior completo"],
             duration: "60 min",
             popular: true
@@ -73,7 +73,7 @@ const Services = () => {
             icon: Sparkles,
             title: "Experiencia VIP",
             description: "El tratamiento más exclusivo con servicios adicionales de lujo",
-            price: "$75",
+            price: "Q75",
             features: ["Todo incluido", "Perfumado especial", "Limpieza motor", "Garantía 30 días"],
             duration: "90 min",
             popular: false
@@ -201,25 +201,6 @@ const Services = () => {
                                     transition={{ duration: 1, ease: "easeOut" }}
                                 >
                                     <VStack align={{ base: "center", lg: "start" }} spacing={{ base: 6, md: 8 }} textAlign={{ base: "center", lg: "left" }}>
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0.8 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: 0.2, duration: 0.6 }}
-                                        >
-                                            <Badge
-                                                bg="linear-gradient(45deg, #FF0000, #FF4444)"
-                                                color="white"
-                                                px={{ base: 4, md: 6 }}
-                                                py={{ base: 2, md: 3 }}
-                                                borderRadius="full"
-                                                fontSize={{ base: "xs", md: "sm" }}
-                                                fontWeight="bold"
-                                                position="relative"
-                                                overflow="hidden"
-                                            >
-                                                🥇 #1 EN GUATEMALA
-                                            </Badge>
-                                        </motion.div>
 
                                         <MotionHeading
                                             as="h1"
@@ -761,9 +742,9 @@ const Services = () => {
                                 {/* Contact info with enhanced styling */}
                                 <SimpleGrid columns={contactColumns} spacing={{ base: 4, md: 6, lg: 8 }} w="100%" maxW="800px">
                                     {[
-                                        { icon: Phone, text: "+502 1234-5678", label: "Llámanos" },
-                                        { icon: MapPin, text: "Zona 10, Guatemala", label: "Visítanos" },
-                                        { icon: Mail, text: "info@carwash.gt", label: "Escríbenos" }
+                                        { icon: Phone, text: "+502 3030-0738", label: "Llámanos" },
+                                        { icon: MapPin, text: "Zona 18, Guatemala", label: "Visítanos" },
+                                        { icon: Mail, text: "+502 3030-0738", label: "Escríbenos" }
                                     ].map((contact, index) => (
                                         <motion.div
                                             key={index}
@@ -882,10 +863,10 @@ const Services = () => {
                         >
                             <VStack spacing={2} align={{ base: "center", md: "start" }}>
                                 <Heading size={{ base: "md", md: "lg" }} fontWeight="black">
-                                    Premium<Text as="span" color="red.500">Wash</Text>
+                                    AutoVentas<Text as="span" color="red.500">Juanes</Text>
                                 </Heading>
                                 <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500" textAlign={{ base: "center", md: "left" }}>
-                                    El mejor carwash de Guatemala desde 2020
+                                    El mejor carwash de Guatemala desde 2025
                                 </Text>
                             </VStack>
 
@@ -895,7 +876,7 @@ const Services = () => {
                                 color="gray.500"
                                 align="center"
                             >
-                                <Text fontSize={{ base: "xs", md: "sm" }}>© 2024 PremiumWash</Text>
+                                <Text fontSize={{ base: "xs", md: "sm" }}>© 2025 AutoVentasJuanes</Text>
                                 <Divider orientation="vertical" h="20px" display={{ base: "none", md: "block" }} />
                                 <Text fontSize={{ base: "xs", md: "sm" }}>Todos los derechos reservados</Text>
                             </Flex>

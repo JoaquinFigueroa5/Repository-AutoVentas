@@ -24,17 +24,32 @@ import useVehicles from '../shared/hooks/useVehicles';
 const MotionBox = motion(Box);
 const MotionButton = motion(Button);
 
-const VehicleDeleteModal = ({ isOpen, onOpen, onClose, selectedCar}) => {
+const VehicleDeleteModal = ({ isOpen, onOpen, onClose, selectedCar }) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const { deleteVehicles, loading, error, fetchVehiclesRecents } = useVehicles();
 
     useEffect(() => {
         fetchVehiclesRecents();
     }, [])
-    
+
     const handleDelete = async (id) => {
-        await deleteVehicles(id)
-        onClose();
+        setIsDeleting(true);
+        try {
+            await deleteVehicles(id)
+            onClose();
+            location.reload();
+        } catch (error) {
+            console.error('Error al eliminar:', error);
+            toast({
+                title: "Error",
+                description: error.message || "No se pudo eliminar el vehículo.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const modalVariants = {

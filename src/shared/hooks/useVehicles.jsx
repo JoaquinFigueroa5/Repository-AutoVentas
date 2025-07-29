@@ -5,7 +5,8 @@ import {
     addVehicles as addVehiclesRequest, 
     getVehiclesRecents as getVehiclesRecentsRequest,
     deleteVehicles as deleteVehiclesRequest,
-    editVehicles as editVehiclesRequest
+    editVehicles as editVehiclesRequest,
+    getVehiclesDashboard as getVehiclesDashboardRequest
 } from "../../services";
 
 const useVehicles = () => {
@@ -31,6 +32,18 @@ const useVehicles = () => {
         setLoading(true);
         try {
             const response = await getVehiclesRecentsRequest();
+            setVehicles(response.data.vehicles)
+        } catch (error) {
+            setError(error.response?.data?.msg || 'Error loading vehicles')
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const fetchVehiclesDashboard = async () => {
+        setLoading(true);
+        try {
+            const response = await getVehiclesDashboardRequest();
             setVehicles(response.data.vehicles)
         } catch (error) {
             setError(error.response?.data?.msg || 'Error loading vehicles')
@@ -157,8 +170,12 @@ const useVehicles = () => {
         fetchVehiclesRecents();
     }, []);
 
+    useEffect(() => {
+        fetchVehiclesDashboard();
+    }, []);
 
-    return { vehicles, fetchVehicles, addVehicles, loading, error, fetchVehiclesRecents, deleteVehicles, editVehicles };
+
+    return { vehicles, fetchVehicles, addVehicles, loading, error, fetchVehiclesRecents, deleteVehicles, editVehicles, fetchVehiclesDashboard };
 };
 
 export default useVehicles;

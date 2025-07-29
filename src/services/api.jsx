@@ -61,6 +61,18 @@ export const getVehiclesRecents = async() => {
     }
 }
 
+export const getVehiclesDashboard = async() => {
+    try {
+        return await apiClient.get('/vehicles/dashboard')
+    } catch (error) {
+        const msg = error.response?.data?.msg || 'Error'
+        return {
+            error: true,
+            msg
+        }
+    }
+}
+
 export const addVehicles = async(data) => {
     try {
         return await apiClient.post('/vehicles/addVehicle', data)
