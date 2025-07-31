@@ -82,23 +82,23 @@ const Services = () => {
 
     const testimonials = [
         {
-            name: "Carlos Méndez",
-            role: "Empresario",
-            text: "El mejor servicio de la ciudad. Mi auto queda como recién salido de la agencia.",
+            name: "Joaquin Figueroa",
+            role: "Ingeniero",
+            text: "Muy buen servicio, como si mi carro nunca hubiera pasado por el basurero de la zona 3.",
             rating: 5,
             avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
         },
         {
-            name: "Ana García",
-            role: "Doctora",
-            text: "Profesionalismo y calidad excepcional. Los recomiendo 100%.",
+            name: "Jeremy Miranda",
+            role: "Joyero",
+            text: "Excelente, ni en mi espejo me veo asi de claro.",
             rating: 5,
             avatar: "https://images.unsplash.com/photo-1494790108755-2616b3e16c3e?w=100&h=100&fit=crop&crop=face"
         },
         {
-            name: "Roberto Silva",
+            name: "Saul de Leon",
             role: "Ingeniero",
-            text: "Increíble atención al detalle. Mi auto nunca había estado tan limpio.",
+            text: "Increíble, ni el carwash del GTA.",
             rating: 5,
             avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face"
         }
@@ -137,7 +137,7 @@ const Services = () => {
     };
 
     const scrollTo = (ref) =>
-        ref?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        ref?.current?.scrollIntoView({ behavior: "smooth", block: "center" })
 
     return (
         <>
@@ -316,7 +316,7 @@ const Services = () => {
                                                 flexWrap="wrap"
                                             >
                                                 <VStack spacing={1}>
-                                                    <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="black" color="red.500">15K+</Text>
+                                                    <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="black" color="red.500">150+</Text>
                                                     <Text fontSize={{ base: "xs", md: "sm" }} color="gray.400">Clientes</Text>
                                                 </VStack>
                                                 <VStack spacing={1}>
@@ -431,20 +431,6 @@ const Services = () => {
                         >
                             <VStack spacing={{ base: 12, md: 16, lg: 20 }}>
                                 <VStack spacing={{ base: 4, md: 6 }} textAlign="center">
-                                    <motion.div variants={itemVariants}>
-                                        <Badge
-                                            bg="linear-gradient(45deg, #FF0000, #FF4444)"
-                                            color="white"
-                                            px={{ base: 4, md: 6 }}
-                                            py={{ base: 2, md: 3 }}
-                                            borderRadius="full"
-                                            fontSize={{ base: "sm", md: "md" }}
-                                            fontWeight="bold"
-                                        >
-                                            ✨ NUESTROS SERVICIOS PREMIUM
-                                        </Badge>
-                                    </motion.div>
-
                                     <motion.div variants={itemVariants}>
                                         <Heading size={{ base: "xl", md: "2xl", lg: "3xl" }} fontWeight="black" textAlign="center">
                                             ELIGE TU
@@ -594,10 +580,10 @@ const Services = () => {
                     <Container maxW={containerMaxW} position="relative" px={{ base: 4, md: 6, lg: 8 }}>
                         <Grid templateColumns={statsColumns} gap={{ base: 6, md: 8 }}>
                             {[
-                                { number: "15,000+", label: "Clientes Satisfechos", icon: Users },
+                                { number: "150+", label: "Clientes Satisfechos", icon: Users },
                                 { number: "99.8%", label: "Tasa de Satisfacción", icon: Star },
                                 { number: "24/7", label: "Servicio Disponible", icon: Clock },
-                                { number: "50+", label: "Premios Ganados", icon: Award }
+                                { number: "1+", label: "Año", icon: Award }
                             ].map((stat, index) => (
                                 <motion.div
                                     key={index}

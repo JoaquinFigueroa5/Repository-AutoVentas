@@ -357,18 +357,6 @@ const AutoSalesDashboard = () => {
         }
     }, [isFullscreen]);
 
-    const toggleFavorite = (carId) => {
-        setFavorites(prev => {
-            const newFavorites = new Set(prev);
-            if (newFavorites.has(carId)) {
-                newFavorites.delete(carId);
-            } else {
-                newFavorites.add(carId);
-            }
-            return newFavorites;
-        });
-    };
-
     const handleImageLoad = (index) => {
         setLoadedImages((prev) => ({ ...prev, [index]: true }));
     };
@@ -389,20 +377,6 @@ const AutoSalesDashboard = () => {
                 </DrawerHeader>
                 <DrawerBody p={0}>
                     <VStack spacing={0} align="stretch">
-                        <Button
-                            leftIcon={<Filter size={18} />}
-                            variant="ghost"
-                            justifyContent="flex-start"
-                            borderRadius={0}
-                            p={6}
-                            color="red.400"
-                            _hover={{
-                                bg: 'rgba(239, 68, 68, 0.1)',
-                                color: 'red.300'
-                            }}
-                        >
-                            Filtros
-                        </Button>
                         <Divider borderColor="gray.700" />
                         <Button
                             leftIcon={<Plus size={18} />}
@@ -447,27 +421,6 @@ const AutoSalesDashboard = () => {
     // Desktop Actions Component
     const DesktopActions = () => (
         <HStack spacing={4}>
-            <Button
-                leftIcon={<Filter size={18} />}
-                variant="outline"
-                borderColor="red.500"
-                color="red.400"
-                bg="rgba(239, 68, 68, 0.1)"
-                backdropFilter="blur(10px)"
-                _hover={{
-                    bg: 'red.500',
-                    color: 'white',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 25px rgba(239, 68, 68, 0.3)'
-                }}
-                borderRadius="lg"
-                px={6}
-                py={6}
-                size={buttonSize}
-                transition="all 0.3s ease"
-            >
-                Filtros
-            </Button>
             <Button
                 leftIcon={<Plus size={18} />}
                 bg="linear-gradient(135deg, #EF4444 0%, #DC2626 100%)"

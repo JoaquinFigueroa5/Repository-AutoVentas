@@ -40,17 +40,17 @@ const useVehicles = () => {
         }
     }
 
-    const fetchVehiclesDashboard = async () => {
-        setLoading(true);
-        try {
-            const response = await getVehiclesDashboardRequest();
-            setVehicles(response.data.vehicles)
-        } catch (error) {
-            setError(error.response?.data?.msg || 'Error loading vehicles')
-        } finally {
-            setLoading(false);
-        }
-    }
+    // const fetchVehiclesDashboard = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const response = await getVehiclesDashboardRequest();
+    //         setVehicles(response.data.vehicles)
+    //     } catch (error) {
+    //         setError(error.response?.data?.msg || 'Error loading vehicles')
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
 
     const addVehicles = async (newVehicle) => {
         setLoading(true);
@@ -162,6 +162,10 @@ const useVehicles = () => {
         }
     }
 
+    // useEffect(() => {
+    //     fetchVehiclesDashboard();
+    // }, []);
+
     useEffect(() => {
         fetchVehicles();
     }, []);
@@ -170,12 +174,9 @@ const useVehicles = () => {
         fetchVehiclesRecents();
     }, []);
 
-    useEffect(() => {
-        fetchVehiclesDashboard();
-    }, []);
 
 
-    return { vehicles, fetchVehicles, addVehicles, loading, error, fetchVehiclesRecents, deleteVehicles, editVehicles, fetchVehiclesDashboard };
+    return { vehicles, fetchVehicles, addVehicles, loading, error, fetchVehiclesRecents, deleteVehicles, editVehicles };
 };
 
 export default useVehicles;

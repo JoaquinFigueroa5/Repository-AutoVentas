@@ -35,15 +35,16 @@ import {
     FaInstagram,
     FaWhatsapp,
     FaPaperPlane,
-    FaUser,
+    FaFacebook,
     FaBuilding
 } from 'react-icons/fa';
+import { useContactRef } from '../context/ContactRefContext';
 
 const MotionBox = motion(Box);
 const MotionButton = motion(Button);
 const MotionIconButton = motion(IconButton);
 
-const ContactFooter = ({ contactRef }) => {
+const ContactFooter = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -54,6 +55,7 @@ const ContactFooter = ({ contactRef }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const contactRef = useContactRef();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -117,14 +119,16 @@ const ContactFooter = ({ contactRef }) => {
     ];
 
     const socialMedia = [
-        { icon: FaTiktok, url: '#', color: '#7b499cff' },
-        { icon: FaInstagram, url: '#', color: '#E4405F' },
-        { icon: FaTwitter, url: '#', color: '#1DA1F2' }
+        { icon: FaTiktok, url: 'https://www.tiktok.com/@autoventas_juanes', color: '#7b499cff' },
+        { icon: FaInstagram, url: 'https://www.instagram.com/autoventas_juanes/', color: '#E4405F' },
+        { icon: FaFacebook, url: 'https://www.facebook.com/profile.php?id=100092329325165', color: '#0866FF' }
     ];
 
     return (
         <>
             <MotionBox
+                ref={contactRef}
+                scrollMarginTop="80px"
                 bg="linear-gradient(135deg, #000000 0%, #1a1a1a 100%)"
                 color="white"
                 pt={20}
@@ -134,7 +138,6 @@ const ContactFooter = ({ contactRef }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8 }}
-                ref={contactRef}
             >
                 {/* Elementos decorativos de fondo */}
                 <Box
@@ -227,23 +230,44 @@ const ContactFooter = ({ contactRef }) => {
 
 
                                     <HStack spacing={4} pt={4}>
-                                        {socialMedia.map((social, index) => (
-                                            <MotionIconButton
-                                                key={index}
-                                                icon={<social.icon />}
-                                                size="lg"
-                                                variant="ghost"
-                                                color="gray.400"
-                                                _hover={{
-                                                    color: social.color,
-                                                    bg: 'whiteAlpha.100',
-                                                    transform: 'translateY(-2px)'
-                                                }}
-                                                transition="all 0.3s"
-                                                whileHover={{ scale: 1.1 }}
-                                                whileTap={{ scale: 0.95 }}
-                                            />
-                                        ))}
+                                        {socialMedia.map((social, index) => {
+                                            const isTiktok = social.icon === FaTiktok;
+
+                                            const Icon = (
+                                                <social.icon
+                                                    style={
+                                                        isTiktok
+                                                            ? {
+                                                                background: 'linear-gradient(135deg, #25F4EE, #FE2C55)',
+                                                                WebkitBackgroundClip: 'text',
+                                                                WebkitTextFillColor: 'transparent',
+                                                            }
+                                                            : { color: social.color }
+                                                    }
+                                                />
+                                            );
+
+                                            return (
+                                                <MotionIconButton
+                                                    as='a'
+                                                    key={index}
+                                                    icon={Icon}
+                                                    size="lg"
+                                                    variant="ghost"
+                                                    color="gray.400"
+                                                    _hover={{
+                                                        color: isTiktok ? undefined : social.color,
+                                                        bg: 'whiteAlpha.100',
+                                                        transform: 'translateY(-2px)',
+                                                    }}
+                                                    transition="all 0.3s"
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    href={social.url}
+                                                />
+                                            );
+                                        })}
+
                                     </HStack>
                                 </VStack>
 
@@ -520,7 +544,7 @@ const ContactFooter = ({ contactRef }) => {
                             </FormControl>
 
                             <Button
-                                onClick={handleSubmit}
+                                as='a'
                                 bg="red.500"
                                 color="white"
                                 _hover={{ bg: 'red.600' }}
@@ -529,6 +553,7 @@ const ContactFooter = ({ contactRef }) => {
                                 isLoading={isSubmitting}
                                 loadingText="Enviando..."
                                 leftIcon={<FaPaperPlane />}
+                                href={`https://api.whatsapp.com/send?phone=50230300738&text=${encodeURIComponent(`Hola, soy ${formData.name} ${formData.apellido} ${formData.email} ${formData.phone} y mi mensaje es: ${formData.message}`)}`}
                             >
                                 Enviar Mensaje
                             </Button>

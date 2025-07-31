@@ -470,6 +470,15 @@ const CarListing = () => {
                                 >
                                     Preparando tu experiencia automotriz
                                 </MotionText>
+                                <MotionText
+                                    fontSize="md"
+                                    color="gray.300"
+                                    textAlign="center"
+                                    mt={2}
+                                    variants={itemVariants}
+                                >
+                                    Por mientras pueden ver nuestra locacion y nuestro contacto aqui abajo 👇
+                                </MotionText>
                             </VStack>
                         </MotionBox>
 

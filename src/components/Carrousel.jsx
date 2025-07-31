@@ -32,7 +32,7 @@ import {
 } from '@chakra-ui/react';
 import { ChevronLeft, ChevronRight, Eye, Heart, Calendar, Gauge, Fuel, Phone, Mail, MapPin, Maximize2, ZoomIn, ZoomOut, X, Car, DollarSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import useVehicles from '../shared/hooks/useVehicles';
+import useVehiclesDashboard from '../shared/hooks/useVehiclesDashboard';
 
 const MotionBox = motion(Box);
 const MotionButton = motion(Button);
@@ -52,7 +52,7 @@ export default function Carrousel() {
     const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { vehicles, fetchVehiclesDashboard, loading } = useVehicles();
+    const { vehicles, fetchVehiclesDashboard, loading } = useVehiclesDashboard();
 
     const containerMaxW = useBreakpointValue({ base: "100%", md: "7xl" });
     const carouselHeight = useBreakpointValue({ base: "500px", md: "550px", lg: "600px" });
@@ -166,18 +166,6 @@ export default function Carrousel() {
 
     const prevSlide = () => {
         setCurrentIndex((prevIndex) => (prevIndex - 1 + vehicles.length) % vehicles.length);
-    };
-
-    const toggleFavorite = (carId) => {
-        setFavorites(prev => {
-            const newFavorites = new Set(prev);
-            if (newFavorites.has(carId)) {
-                newFavorites.delete(carId);
-            } else {
-                newFavorites.add(carId);
-            }
-            return newFavorites;
-        });
     };
 
     const handleImageLoad = (index) => {
@@ -310,7 +298,6 @@ export default function Carrousel() {
                     position="relative"
                     overflow="hidden"
                 >
-                    {/* Elementos de fondo animados */}
                     <MotionBox
                         position="absolute"
                         top="20%"
@@ -338,7 +325,6 @@ export default function Carrousel() {
                     />
 
                     <VStack spacing={8} zIndex={1}>
-                        {/* Spinner principal */}
                         <MotionBox variants={itemVariants}>
                             <MotionBox
                                 width="80px"
@@ -352,7 +338,6 @@ export default function Carrousel() {
                             />
                         </MotionBox>
 
-                        {/* Icono de vehículo estilizado */}
                         <MotionBox variants={itemVariants}>
                             <MotionBox
                                 variants={pulseVariants}
@@ -383,7 +368,6 @@ export default function Carrousel() {
                             </MotionBox>
                         </MotionBox>
 
-                        {/* Texto principal */}
                         <MotionBox variants={itemVariants}>
                             <VStack spacing={3}>
                                 <MotionText
@@ -397,7 +381,6 @@ export default function Carrousel() {
                                     Cargando Vehículos
                                 </MotionText>
 
-                                {/* Puntos animados */}
                                 <HStack spacing={2}>
                                     {[0, 1, 2].map((index) => (
                                         <MotionBox
@@ -427,10 +410,18 @@ export default function Carrousel() {
                                 >
                                     Preparando tu experiencia automotriz
                                 </MotionText>
+                                <MotionText
+                                    fontSize="md"
+                                    color="gray.300"
+                                    textAlign="center"
+                                    mt={2}
+                                    variants={itemVariants}
+                                >
+                                    Por mientras pueden ver nuestra locacion y nuestro contacto aqui abajo 👇
+                                </MotionText>
                             </VStack>
                         </MotionBox>
 
-                        {/* Barra de progreso animada */}
                         <MotionBox variants={itemVariants} width="300px">
                             <Box
                                 width="100%"
@@ -456,7 +447,6 @@ export default function Carrousel() {
                         </MotionBox>
                     </VStack>
 
-                    {/* Efectos de partículas */}
                     {[...Array(6)].map((_, index) => (
                         <MotionBox
                             key={index}
@@ -492,7 +482,6 @@ export default function Carrousel() {
     return (
         <Box bg="black" minH="100vh" py={{ base: 4, md: 8 }}>
             <Container maxW={containerMaxW} px={{ base: 4, md: 6 }}>
-                {/* Header */}
                 <VStack spacing={{ base: 4, md: 6 }} mb={{ base: 8, md: 12 }}>
                     <MotionBox
                         initial={{ opacity: 0, y: -20 }}
@@ -538,7 +527,6 @@ export default function Carrousel() {
                     </MotionBox>
                 </VStack>
 
-                {/* Main Carousel */}
                 <Box position="relative" overflow="hidden" borderRadius="2xl" mb={8}>
                     <AnimatePresence mode="wait">
                         <MotionBox
@@ -553,7 +541,6 @@ export default function Carrousel() {
                             borderRadius="2xl"
                             overflow="hidden"
                         >
-                            {/* Background Image */}
                             <Box
                                 position="absolute"
                                 top="0"
@@ -566,7 +553,6 @@ export default function Carrousel() {
                                 filter="blur(0.5px)"
                             />
 
-                            {/* Content */}
                             <Flex
                                 position="relative"
                                 h="100%"
@@ -577,7 +563,6 @@ export default function Carrousel() {
                                 direction={{ base: "column", lg: "row" }}
                                 gap={{ base: 6, lg: 0 }}
                             >
-                                {/* Car Info */}
                                 <MotionBox
                                     initial={{ opacity: 0, x: -50 }}
                                     animate={{ opacity: 1, x: 0 }}
@@ -605,17 +590,7 @@ export default function Carrousel() {
                                     >
                                         {currentCar.name} {currentCar.model} {currentCar.year}
                                     </Heading>
-
-                                    {/* <Text
-                                        color="gray.300"
-                                        fontSize={textSize}
-                                        mb={6}
-                                        lineHeight="1.6"
-                                        display={{ base: "none", md: "block" }}
-                                    >
-                                        {currentCar.description}
-                                    </Text> */}
-
+                                    
                                     <HStack
                                         spacing={{ base: 4, md: 6 }}
                                         mb={6}
@@ -671,32 +646,9 @@ export default function Carrousel() {
                                         >
                                             Ver Detalles
                                         </MotionButton>
-
-                                        <MotionButton
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            variant="outline"
-                                            borderColor="white"
-                                            color="white"
-                                            size={buttonSize}
-                                            px={8}
-                                            _hover={{ bg: "white", color: "black" }}
-                                            onClick={() => toggleFavorite(currentCar._id)}
-                                            leftIcon={
-                                                <Heart
-                                                    size={20}
-                                                    fill={favorites.has(currentCar._id) ? "#ef4444" : "none"}
-                                                    color={favorites.has(currentCar._id) ? "#ef4444" : "white"}
-                                                />
-                                            }
-                                            w={{ base: "full", sm: "auto" }}
-                                        >
-                                            {favorites.has(currentCar._id) ? "Favorito" : "Favoritos"}
-                                        </MotionButton>
                                     </Stack>
                                 </MotionBox>
 
-                                {/* Car Image */}
                                 <MotionBox
                                     initial={{ opacity: 0, x: 50 }}
                                     animate={{ opacity: 1, x: 0 }}
@@ -718,7 +670,6 @@ export default function Carrousel() {
                         </MotionBox>
                     </AnimatePresence>
 
-                    {/* Navigation Buttons */}
                     <IconButton
                         aria-label="Previous"
                         icon={<ChevronLeft size={24} />}
@@ -752,7 +703,6 @@ export default function Carrousel() {
                     />
                 </Box>
 
-                {/* Dots Indicator */}
                 <HStack justify="center" spacing={3} mb={12} flexWrap="wrap">
                     {vehicles.map((_, index) => (
                         <MotionBox
@@ -780,7 +730,6 @@ export default function Carrousel() {
                         Agregados recientemente
                     </Text>
                 </HStack>
-                {/* Car Grid */}
                 <MotionGrid
                     templateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr']}
                     gap={8}
@@ -802,7 +751,6 @@ export default function Carrousel() {
                             transition="all 0.3s ease"
                             onClick={() => openModal(vehicle)}
                         >
-                            {/* Imagen */}
                             <Box position="relative" overflow="hidden">
                                 <Image
                                     src={vehicle.images[0].url}
@@ -829,9 +777,7 @@ export default function Carrousel() {
                                 </Box>
                             </Box>
 
-                            {/* Contenido */}
                             <VStack p={6} align="start" spacing={4}>
-                                {/* Título y precio */}
                                 <Flex justify="space-between" align="start" w="full">
                                     <VStack align="start" spacing={1}>
                                         <Text fontSize="xl" fontWeight="bold" color="white">
@@ -846,7 +792,6 @@ export default function Carrousel() {
                                     </Text>
                                 </Flex>
 
-                                {/* Badges */}
                                 <HStack spacing={2} flexWrap="wrap">
                                     <Badge colorScheme="red" variant="subtle">
                                         {vehicle.year}
@@ -856,7 +801,6 @@ export default function Carrousel() {
                                     </Badge>
                                 </HStack>
 
-                                {/* Especificaciones */}
                                 <Grid templateColumns="1fr 1fr 1fr" gap={4} w="full">
                                     <VStack spacing={1}>
                                         <Calendar size={16} color="#EF4444" />
@@ -878,7 +822,6 @@ export default function Carrousel() {
                                     </VStack>
                                 </Grid>
 
-                                {/* Botón */}
                                 <Button
                                     w="full"
                                     bg="red.500"
@@ -896,7 +839,6 @@ export default function Carrousel() {
                     ))}
                 </MotionGrid>
 
-                {/* Modal Principal */}
                 <Modal isOpen={isOpen} onClose={onClose} size={modalSize}>
                     <ModalOverlay bg="rgba(0,0,0,0.8)" />
                     <ModalContent
@@ -920,7 +862,6 @@ export default function Carrousel() {
                                 templateColumns={{ base: "1fr", md: "1fr 1fr" }}
                                 gap={{ base: 4, md: 7 }}
                             >
-                                {/* Imagen principal y miniaturas */}
                                 <GridItem>
                                     <Box position="relative" mb={4}>
                                         <Image
@@ -932,7 +873,6 @@ export default function Carrousel() {
                                             borderRadius="lg"
                                         />
 
-                                        {/* Botón de maximizar en esquina inferior derecha */}
                                         <IconButton
                                             icon={<Maximize2 size={16} />}
                                             aria-label="Maximizar imagen"
@@ -947,7 +887,6 @@ export default function Carrousel() {
                                             onClick={openFullscreen}
                                         />
 
-                                        {/* Navegación en imagen principal (solo si hay múltiples imágenes) */}
                                         {selectedCar?.images?.length > 1 && (
                                             <>
                                                 <IconButton
@@ -981,7 +920,6 @@ export default function Carrousel() {
                                             </>
                                         )}
 
-                                        {/* Contador de imágenes */}
                                         {selectedCar?.images?.length > 1 && (
                                             <Box
                                                 position="absolute"
@@ -999,7 +937,6 @@ export default function Carrousel() {
                                         )}
                                     </Box>
 
-                                    {/* Galería responsiva */}
                                     <Box
                                         maxH={{ base: "auto", md: "500px" }}
                                         overflowY="auto"
@@ -1055,7 +992,6 @@ export default function Carrousel() {
                                     </Box>
                                 </GridItem>
 
-                                {/* Detalles */}
                                 <GridItem>
                                     <VStack align="start" spacing={4}>
                                         <Text color="red.400" fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">
@@ -1141,7 +1077,6 @@ export default function Carrousel() {
                     </ModalContent>
                 </Modal>
 
-                {/* Modal Fullscreen para zoom e imágenes */}
                 <Modal isOpen={isFullscreen} onClose={closeFullscreen} size="full">
                     <ModalOverlay bg="rgba(0,0,0,0.95)" />
                     <ModalContent bg="transparent" boxShadow="none">
@@ -1154,7 +1089,6 @@ export default function Carrousel() {
                             justifyContent="center"
                             overflow="hidden"
                         >
-                            {/* Imagen con zoom */}
                             <Box
                                 w="100%"
                                 h="100%"
@@ -1180,7 +1114,6 @@ export default function Carrousel() {
                                 />
                             </Box>
 
-                            {/* Controles de zoom */}
                             <VStack
                                 position="absolute"
                                 right={4}
@@ -1216,7 +1149,6 @@ export default function Carrousel() {
                                 />
                             </VStack>
 
-                            {/* Navegación entre imágenes */}
                             {selectedCar?.images?.length > 1 && (
                                 <>
                                     <IconButton
@@ -1250,7 +1182,6 @@ export default function Carrousel() {
                                 </>
                             )}
 
-                            {/* Botón de cerrar */}
                             <IconButton
                                 icon={<X size={24} />}
                                 aria-label="Cerrar"
@@ -1265,7 +1196,6 @@ export default function Carrousel() {
                                 onClick={closeFullscreen}
                             />
 
-                            {/* Información de la imagen */}
                             <Box
                                 position="absolute"
                                 bottom={4}

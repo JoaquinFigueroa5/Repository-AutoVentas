@@ -9,9 +9,6 @@ import {
     Button,
     IconButton,
     Text,
-    Input,
-    InputGroup,
-    InputRightElement,
     Badge,
     Menu,
     Drawer,
@@ -50,6 +47,7 @@ import { FaMapMarkerAlt } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import useUserStore from '../context/UserStore';
 import { HamburgerIcon } from '@chakra-ui/icons';
+import { useContactRef } from '../context/ContactRefContext';
 
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
@@ -63,8 +61,7 @@ export default function PremiumNavbar() {
     const [notifications, setNotifications] = useState(5);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { user, fetchUser } = useUserStore();
-
-    const contactRef = useRef(null);
+    const contactRef = useContactRef();
 
     const navItems = [
         {
@@ -76,11 +73,6 @@ export default function PremiumNavbar() {
             label: 'Servicios',
             icon: Shield,
             href: '/services'
-        },
-        {
-            label: 'Contacto',
-            icon: Phone,
-            ref: contactRef
         }
     ];
 
@@ -96,12 +88,37 @@ export default function PremiumNavbar() {
         setActiveDropdown(activeDropdown === index ? null : index);
     };
 
-    const scrollTo = (ref) =>
-        ref?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const scrollToContact = () => {
+        const element = contactRef.current;
+        if (!element) return;
+
+        const targetY = element.getBoundingClientRect().top + window.scrollY;
+        const startY = window.scrollY;
+        const duration = 1500;
+        const startTime = performance.now();
+        const offset = -80;
+
+        function animateScroll(time) {
+            const elapsed = time - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            const ease = progress < 0.5
+                ? 2 * progress * progress
+                : -1 + (4 - 2 * progress) * progress;
+
+            window.scrollTo(0, startY + (targetY - startY) * ease + offset);
+
+            if (progress < 1) {
+                requestAnimationFrame(animateScroll);
+            }
+        }
+
+        requestAnimationFrame(animateScroll);
+    };
+
 
     return (
         <>
-            {/* Main Navbar */}
             <MotionBox
                 position="fixed"
                 top={0}
@@ -119,7 +136,6 @@ export default function PremiumNavbar() {
             >
                 <Container maxW="7xl" py={4}>
                     <Flex align="center" justify="space-between">
-                        {/* Logo */}
                         <MotionFlex
                             as='a'
                             align="center"
@@ -155,7 +171,6 @@ export default function PremiumNavbar() {
 
                         </MotionFlex>
 
-                        {/* Desktop Navigation */}
                         <HStack spacing={8} display={{ base: 'none', lg: 'flex' }}>
                             {navItems.map((item, index) => (
                                 <Box key={index} position="relative">
@@ -173,7 +188,6 @@ export default function PremiumNavbar() {
                                         }}
                                         onClick={() => {
                                             item.submenu && handleDropdownToggle(index),
-                                                scrollTo(item.ref),
                                                 item.href
                                         }
                                         }
@@ -183,142 +197,29 @@ export default function PremiumNavbar() {
                                         href={item.href}
                                     >
                                         {item.label}
-                                        {item.badge && (
-                                            <Badge
-                                                position="absolute"
-                                                top="-8px"
-                                                right="-8px"
-                                                colorScheme="red"
-                                                borderRadius="full"
-                                                fontSize="xs"
-                                                minW="20px"
-                                                h="20px"
-                                                display="flex"
-                                                alignItems="center"
-                                                justifyContent="center"
-                                            >
-                                                {item.badge}
-                                            </Badge>
-                                        )}
                                     </MotionButton>
-
-                                    {/* Dropdown Menu */}
-                                    <AnimatePresence>
-                                        {item.submenu && activeDropdown === index && (
-                                            <MotionBox
-                                                initial={{ opacity: 0, y: -10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -10 }}
-                                                transition={{ duration: 0.2 }}
-                                                position="absolute"
-                                                top="100%"
-                                                left={0}
-                                                mt={2}
-                                                bg="gray.900"
-                                                border="1px solid"
-                                                borderColor="gray.700"
-                                                borderRadius="xl"
-                                                boxShadow="xl"
-                                                minW="200px"
-                                                py={2}
-                                                zIndex={1001}
-                                            >
-                                                {item.submenu.map((subItem, subIndex) => (
-                                                    <MotionFlex
-                                                        key={subIndex}
-                                                        align="center"
-                                                        px={4}
-                                                        py={3}
-                                                        color="white"
-                                                        cursor="pointer"
-                                                        _hover={{
-                                                            bg: "rgba(239,68,68,0.1)",
-                                                            color: "red.400"
-                                                        }}
-                                                        whileHover={{ x: 5 }}
-                                                        transition={{ duration: 0.2 }}
-                                                    >
-                                                        <subItem.icon size={16} />
-                                                        <Text ml={3} fontSize="sm">
-                                                            {subItem.label}
-                                                        </Text>
-                                                    </MotionFlex>
-                                                ))}
-                                            </MotionBox>
-                                        )}
-                                    </AnimatePresence>
                                 </Box>
                             ))}
+                            <MotionButton
+                                variant="ghost"
+                                color="white"
+                                size="md"
+                                leftIcon={<Phone size={18} />}
+                                _hover={{
+                                    bg: "rgba(239,68,68,0.1)",
+                                    color: "red.400",
+                                    transform: "translateY(-2px)"
+                                }}
+                                onClick={scrollToContact}
+                                position="relative"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                Contacto
+                            </MotionButton>
                         </HStack>
 
-                        {/* Search Bar */}
-                        {/* <InputGroup
-                            maxW="300px"
-                            display={{ base: 'none', md: 'block' }}
-                            position="relative"
-                        >
-                            <Input
-                                placeholder="Buscar vehículos..."
-                                bg="rgba(255,255,255,0.1)"
-                                border="1px solid"
-                                borderColor="rgba(255,255,255,0.2)"
-                                color="white"
-                                _placeholder={{ color: "gray.400" }}
-                                _focus={{
-                                    borderColor: "red.500",
-                                    boxShadow: "0 0 0 1px #ef4444"
-                                }}
-                                borderRadius="lg"
-                                value={searchValue}
-                                onChange={(e) => setSearchValue(e.target.value)}
-                            />
-                            <InputRightElement>
-                                <IconButton
-                                    aria-label="Search"
-                                    icon={<Search size={18} />}
-                                    size="sm"
-                                    bg="red.500"
-                                    color="white"
-                                    borderRadius="md"
-                                    _hover={{ bg: "red.600" }}
-                                />
-                            </InputRightElement>
-                        </InputGroup> */}
-
-                        {/* Right Actions */}
                         <HStack spacing={4}>
-                            {/* Notifications */}
-                            <Box position="relative" display={{ base: 'none', md: 'block' }}>
-                                <MotionButton
-                                    variant="ghost"
-                                    color="white"
-                                    size="md"
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    _hover={{ color: "red.400" }}
-                                >
-                                    <Bell size={20} />
-                                    {notifications > 0 && (
-                                        <Badge
-                                            position="absolute"
-                                            top="-2px"
-                                            right="-2px"
-                                            colorScheme="red"
-                                            borderRadius="full"
-                                            fontSize="xs"
-                                            minW="18px"
-                                            h="18px"
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="center"
-                                        >
-                                            {notifications}
-                                        </Badge>
-                                    )}
-                                </MotionButton>
-                            </Box>
-
-                            {/* Mobile Menu Button */}
                             <IconButton
                                 aria-label="Open menu"
                                 icon={<HamburgerIcon size={24} />}
@@ -333,7 +234,6 @@ export default function PremiumNavbar() {
                 </Container>
             </MotionBox>
 
-            {/* Mobile Drawer */}
             <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="sm">
                 <DrawerOverlay bg="rgba(0,0,0,0.8)" />
                 <DrawerContent bg="gray.900" color="white">
@@ -361,7 +261,6 @@ export default function PremiumNavbar() {
 
                     <DrawerBody>
                         <VStack spacing={6} align="stretch" py={4}>
-                            {/* Mobile Navigation */}
                             <VStack spacing={4} align="stretch">
                                 {navItems.map((item, index) => (
                                     <Box key={index}>
@@ -384,49 +283,34 @@ export default function PremiumNavbar() {
                                             href={item.href}
                                         >
                                             {item.label}
-                                            {item.badge && (
-                                                <Badge
-                                                    position="absolute"
-                                                    right="20px"
-                                                    colorScheme="red"
-                                                    borderRadius="full"
-                                                    fontSize="xs"
-                                                >
-                                                    {item.badge}
-                                                </Badge>
-                                            )}
                                         </MotionButton>
-
-                                        {/* Mobile Submenu */}
-                                        <Collapse in={item.submenu && activeDropdown === index}>
-                                            <VStack spacing={2} align="stretch" pl={8} pt={2}>
-                                                {item.submenu?.map((subItem, subIndex) => (
-                                                    <MotionButton
-                                                        key={subIndex}
-                                                        variant="ghost"
-                                                        color="gray.300"
-                                                        size="md"
-                                                        width="100%"
-                                                        justifyContent="flex-start"
-                                                        leftIcon={<subItem.icon size={16} />}
-                                                        _hover={{
-                                                            bg: "rgba(239,68,68,0.1)",
-                                                            color: "red.400"
-                                                        }}
-                                                        whileHover={{ x: 5 }}
-                                                    >
-                                                        {subItem.label}
-                                                    </MotionButton>
-                                                ))}
-                                            </VStack>
-                                        </Collapse>
                                     </Box>
                                 ))}
+                                <MotionButton
+                                    variant="ghost"
+                                    color="white"
+                                    size="lg"
+                                    width="100%"
+                                    leftIcon={<Phone size={18} />}
+                                    _hover={{
+                                        bg: "rgba(239,68,68,0.1)",
+                                        color: "red.400",
+                                        transform: "translateY(-2px)"
+                                    }}
+                                    justifyContent="flex-start"
+                                    onClick={() => {
+                                        scrollToContact();
+                                        onClose();
+                                    }}
+                                    whileHover={{ x: 5 }}
+                                    position="relative"
+                                >
+                                    Contacto
+                                </MotionButton>
                             </VStack>
 
                             <Divider borderColor="gray.700" />
 
-                            {/* Contact Info */}
                             <VStack spacing={3} align="stretch">
                                 <Text fontSize="lg" fontWeight="bold" color="red.400">
                                     Contacto
@@ -521,7 +405,6 @@ export default function PremiumNavbar() {
                 </DrawerContent>
             </Drawer>
 
-            {/* Overlay for dropdown */}
             {activeDropdown !== null && (
                 <Box
                     position="fixed"
