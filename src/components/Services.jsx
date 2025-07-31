@@ -776,6 +776,7 @@ const Services = () => {
                                         style={{ width: "100%" }}
                                     >
                                         <Button
+                                            as='a'
                                             size={{ base: "lg", md: "xl" }}
                                             bg="linear-gradient(45deg, #FF0000, #FF4444)"
                                             color="white"
@@ -794,6 +795,7 @@ const Services = () => {
                                             overflow="hidden"
                                             w={{ base: "100%", sm: "auto" }}
                                             maxW={{ base: "100%", sm: "400px" }}
+                                            href={`https://api.whatsapp.com/send?phone=50230300738&text=${encodeURIComponent(`Buenas tardes, quisiera agendar una cita para el lavado de mi carro a las...`)}`}
                                         >
                                             <Box
                                                 position="absolute"
