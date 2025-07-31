@@ -18,6 +18,7 @@ import {
     DrawerContent,
     DrawerCloseButton,
     useDisclosure,
+    useBreakpointValue,
     Collapse,
     Divider,
     Image
@@ -62,6 +63,15 @@ export default function PremiumNavbar() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { user, fetchUser } = useUserStore();
     const contactRef = useContactRef();
+
+    const containerMaxW = useBreakpointValue({ base: 'full', sm: 'xl', md: '4xl', lg: '6xl', xl: '7xl' });
+    const navPadding = useBreakpointValue({ base: 4, sm: 4, md: 4 });
+    const logoWidth = useBreakpointValue({ base: '120px', sm: '140px', md: '160px' });
+    const logoHeight = useBreakpointValue({ base: '50px', sm: '65px', md: '80px' });
+    const headingSize = useBreakpointValue({ base: 'md', sm: 'lg', md: 'lg' });
+    const brandTextSize = useBreakpointValue({ base: 'lg', sm: 'xl', md: 'xl' });
+    const buttonSize = useBreakpointValue({ base: 'sm', md: 'md' });
+    const iconSize = useBreakpointValue({ base: 16, md: 18 });
 
     const navItems = [
         {
@@ -134,7 +144,7 @@ export default function PremiumNavbar() {
                     backgroundColor: isScrolled ? "rgba(0,0,0,0.95)" : "rgba(0,0,0,0.8)"
                 }}
             >
-                <Container maxW="7xl" py={4}>
+                <Container maxW={containerMaxW} py={navPadding} px={{ base: 4, sm: 6, md: 8 }}>
                     <Flex align="center" justify="space-between">
                         <MotionFlex
                             as='a'
@@ -142,14 +152,17 @@ export default function PremiumNavbar() {
                             whileHover={{ scale: 1.05 }}
                             cursor="pointer"
                             href='/'
+                            flex="0 0 auto"
+                            minW="fit-content"
                         >
                             <MotionBox
-                                w="160px"
-                                h="80px"
-                                p={2}
+                                w={logoWidth}
+                                h={logoHeight}
+                                p={{ base: 1, sm: 1.5, md: 2 }}
                                 bg="whiteAlpha.900"
-                                borderRadius="xl"
-                                mr={3}
+                                borderRadius={{ base: 'lg', md: 'xl' }}
+                                mr={{ base: 2, sm: 3 }}
+                                flexShrink={0}
                             >
                                 <Image
                                     src="https://res.cloudinary.com/dbh9jfkoh/image/upload/v1752969460/LogoJuanes_ner8yk.png"
@@ -159,27 +172,47 @@ export default function PremiumNavbar() {
                                 />
                             </MotionBox>
 
-                            <VStack align="flex-end" spacing={0} pr={5} >
-                                <Heading color="white" size="lg" fontWeight="bold">
+                            <VStack
+                                align="flex-end"
+                                spacing={0}
+                                pr={{ base: 2, sm: 3, md: 5 }}
+                                display={{ base: 'flex', xs: 'flex' }}
+                            >
+                                <Heading
+                                    color="white"
+                                    size={headingSize}
+                                    fontWeight="bold"
+                                    lineHeight="shorter"
+                                >
                                     <Text as="span" color="red.500">Auto</Text>
                                     <Text as="span">Ventas</Text>
                                 </Heading>
-                                <Text color="red.500" fontSize="xl" letterSpacing="wider" fontWeight="bold">
+                                <Text
+                                    color="red.500"
+                                    fontSize={brandTextSize}
+                                    letterSpacing="wider"
+                                    fontWeight="bold"
+                                    lineHeight="shorter"
+                                >
                                     Juanes
                                 </Text>
                             </VStack>
-
                         </MotionFlex>
 
-                        <HStack spacing={8} display={{ base: 'none', lg: 'flex' }}>
+                        <HStack
+                            spacing={{ base: 4, lg: 6, xl: 8 }}
+                            display={{ base: 'none', lg: 'flex' }}
+                            flex="1"
+                            justify="center"
+                        >
                             {navItems.map((item, index) => (
                                 <Box key={index} position="relative">
                                     <MotionButton
                                         as='a'
                                         variant="ghost"
                                         color="white"
-                                        size="md"
-                                        leftIcon={<item.icon size={18} />}
+                                        size={buttonSize}
+                                        leftIcon={<item.icon size={iconSize} />}
                                         rightIcon={item.submenu ? <ChevronDown size={16} /> : null}
                                         _hover={{
                                             bg: "rgba(239,68,68,0.1)",
@@ -187,14 +220,13 @@ export default function PremiumNavbar() {
                                             transform: "translateY(-2px)"
                                         }}
                                         onClick={() => {
-                                            item.submenu && handleDropdownToggle(index),
-                                                item.href
-                                        }
-                                        }
+                                            item.submenu && handleDropdownToggle(index);
+                                        }}
                                         position="relative"
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                         href={item.href}
+                                        fontSize={{ base: 'sm', xl: 'md' }}
                                     >
                                         {item.label}
                                     </MotionButton>
@@ -203,8 +235,8 @@ export default function PremiumNavbar() {
                             <MotionButton
                                 variant="ghost"
                                 color="white"
-                                size="md"
-                                leftIcon={<Phone size={18} />}
+                                size={buttonSize}
+                                leftIcon={<Phone size={iconSize} />}
                                 _hover={{
                                     bg: "rgba(239,68,68,0.1)",
                                     color: "red.400",
@@ -214,20 +246,22 @@ export default function PremiumNavbar() {
                                 position="relative"
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
+                                fontSize={{ base: 'sm', xl: 'md' }}
                             >
                                 Contacto
                             </MotionButton>
                         </HStack>
 
-                        <HStack spacing={4}>
+                        <HStack spacing={4} flex="0 0 auto">
                             <IconButton
                                 aria-label="Open menu"
-                                icon={<HamburgerIcon size={24} />}
+                                icon={<HamburgerIcon />}
                                 variant="outline"
                                 color="whiteAlpha.900"
                                 display={{ base: 'flex', lg: 'none' }}
-                                _hover={{ color: "red.400" }}
+                                _hover={{ color: "red.400", borderColor: "red.400" }}
                                 onClick={onOpen}
+                                size={{ base: 'sm', sm: 'md' }}
                             />
                         </HStack>
                     </Flex>

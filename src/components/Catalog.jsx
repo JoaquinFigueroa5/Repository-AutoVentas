@@ -1505,21 +1505,6 @@ const CarListing = () => {
                                         </Text>
                                     )}
                                 </Box>
-
-                                {/* Instrucciones de uso */}
-                                <Box
-                                    position="absolute"
-                                    top={4}
-                                    left={4}
-                                    bg="rgba(0,0,0,0.7)"
-                                    color="white"
-                                    px={3}
-                                    py={2}
-                                    borderRadius="md"
-                                    fontSize="xs"
-                                >
-                                    <Text>ESC: Salir • ←→: Navegar • +/-: Zoom • Arrastrar para mover</Text>
-                                </Box>
                             </Box>
                         </ModalContent>
                     </Modal>
