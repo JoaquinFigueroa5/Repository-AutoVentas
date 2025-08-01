@@ -29,6 +29,7 @@ import {
     Image,
     SimpleGrid,
     IconButton,
+    useBreakpointValue
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -48,6 +49,9 @@ const MotionButton = motion(Button);
 const ModalAddVehicle = ({ isOpen, onOpen, onClose }) => {
     const { addVehicles, fetchVehicles, loading, vehicles, error } = useVehicles();
     const toast = useToast();
+
+    const isMobile = useBreakpointValue({ base: true, md: false });
+    const buttonSize = useBreakpointValue({ base: "md", md: "lg" });
 
     const [formData, setFormData] = useState({
         name: '',
@@ -592,11 +596,16 @@ const ModalAddVehicle = ({ isOpen, onOpen, onClose }) => {
         <>
             <AnimatePresence>
                 {isOpen && (
-                    <Modal isOpen={isOpen} onClose={onClose} size="2xl" closeOnOverlayClick={false}
-
-    scrollBehavior="inside"
-    blockScrollOnMount={true}
-    preserveScrollBarGap={true}>
+                    <Modal
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        size={isMobile ? "full" : "2xl"}
+                        closeOnOverlayClick={false}
+                        scrollBehavior="inside"
+                        blockScrollOnMount={false}
+                        preserveScrollBarGap={false}
+                        motionPreset="slideInBottom"
+                    >
                         <ModalOverlay
                             bg="blackAlpha.800"
                             backdropFilter="blur(10px)"
@@ -607,15 +616,29 @@ const ModalAddVehicle = ({ isOpen, onOpen, onClose }) => {
                             initial="hidden"
                             animate="visible"
                             exit="exit"
-                            maxW="700px"
-                            mx={4}
+                            maxW={isMobile ? "100vw" : "700px"}
+                            maxH={isMobile ? "100vh" : "95vh"}
+                            h={isMobile ? "100vh" : "auto"}
+                            mx={isMobile ? 0 : 4}
+                            my={isMobile ? 0 : 4}
                             bg="gray.900"
-                            borderRadius="2xl"
+                            borderRadius={isMobile ? "0" : "2xl"}
                             border="3px solid"
                             borderColor="red.500"
                             overflow="hidden"
+                            display="flex"
+                            flexDirection="column"
+                            position="relative"
                         >
-                            <ModalHeader bg="black" borderBottom="2px solid" borderBottomColor="red.500">
+                            <ModalHeader
+                                bg="black"
+                                borderBottom="2px solid"
+                                borderBottomColor="red.500"
+                                flexShrink={0}
+                                position="sticky"
+                                top={0}
+                                zIndex={1}
+                            >
                                 <VStack spacing={4} align="start">
                                     <Text fontSize="2xl" fontWeight="bold" color="white">
                                         Agregar Nuevo Vehículo
@@ -650,94 +673,184 @@ const ModalAddVehicle = ({ isOpen, onOpen, onClose }) => {
                                 size="lg"
                             />
 
-                            <ModalBody pb={6} pt={8}>
-                                <Box minH="450px">
+                            <ModalBody
+                                flex="1"
+                                overflowY="scroll" // Forzar scroll
+                                overflowX="hidden"
+                                pb={6}
+                                pt={8}
+                                // Estilos específicos para móvil
+                                css={{
+                                    WebkitOverflowScrolling: 'touch', // Smooth scroll en iOS
+                                    '&::-webkit-scrollbar': {
+                                        width: isMobile ? '0px' : '8px', // Ocultar en móvil
+                                    },
+                                    '&::-webkit-scrollbar-track': {
+                                        background: '#1a1a1a',
+                                    },
+                                    '&::-webkit-scrollbar-thumb': {
+                                        background: '#dc2626',
+                                        borderRadius: '4px',
+                                    },
+                                }}
+                                // Eventos touch para asegurar scroll
+                                onTouchStart={(e) => e.stopPropagation()}
+                                onTouchMove={(e) => e.stopPropagation()}
+                            >
+                                <Box
+                                    minH={isMobile ? "calc(100vh - 200px)" : "auto"}
+                                    pb={isMobile ? "100px" : "0"} // Padding extra en móvil
+                                >
                                     <AnimatePresence mode="wait">
                                         {renderStepContent()}
                                     </AnimatePresence>
                                 </Box>
                             </ModalBody>
 
-                            <ModalFooter bg="black" borderTop="2px solid" borderTopColor="red.500">
-                                <HStack spacing={4} w="full" justifyContent="space-between">
-                                    <MotionButton
-                                        variant="outline"
-                                        onClick={prevStep}
-                                        isDisabled={currentStep === 1}
-                                        borderColor="gray.600"
-                                        borderWidth="2px"
-                                        color="white"
-                                        bg="transparent"
-                                        _hover={{
-                                            borderColor: currentStep === 1 ? 'gray.600' : 'red.400',
-                                            color: currentStep === 1 ? 'gray.500' : 'red.400',
-                                            bg: currentStep === 1 ? 'transparent' : 'red.900'
-                                        }}
-                                        _disabled={{
-                                            opacity: 0.4,
-                                            cursor: 'not-allowed'
-                                        }}
-                                        whileHover={{ scale: currentStep === 1 ? 1 : 1.05 }}
-                                        whileTap={{ scale: currentStep === 1 ? 1 : 0.95 }}
-                                        size="lg"
-                                    >
-                                        Anterior
-                                    </MotionButton>
+                            <ModalFooter
+                                bg="black"
+                                borderTop="2px solid"
+                                borderTopColor="red.500"
+                                flexShrink={0}
+                                position="sticky"
+                                bottom={0}
+                                zIndex={1}
+                                p={{ base: 4, md: 6 }}
+                            >
+                                {isMobile ? (
+                                    // Layout móvil
+                                    <VStack spacing={4} w="full">
+                                        <HStack spacing={3} w="full" justifyContent="center">
+                                            {currentStep < 2 ? (
+                                                <MotionButton
+                                                    bg="red.600"
+                                                    color="white"
+                                                    onClick={nextStep}
+                                                    size={buttonSize}
+                                                    flex={1}
+                                                    maxW="200px"
+                                                >
+                                                    Siguiente
+                                                </MotionButton>
+                                            ) : (
+                                                <MotionButton
+                                                    bg="red.600"
+                                                    color="white"
+                                                    onClick={handleSubmit}
+                                                    isLoading={isSubmitting}
+                                                    size={buttonSize}
+                                                    flex={1}
+                                                    maxW="200px"
+                                                >
+                                                    Guardar
+                                                </MotionButton>
+                                            )}
+                                        </HStack>
 
-                                    <HStack spacing={3}>
+                                        <HStack spacing={3} w="full">
+                                            <MotionButton
+                                                variant="outline"
+                                                onClick={prevStep}
+                                                isDisabled={currentStep === 1}
+                                                size={buttonSize}
+                                                flex={1}
+                                            >
+                                                Anterior
+                                            </MotionButton>
+
+                                            <MotionButton
+                                                variant="outline"
+                                                onClick={onClose}
+                                                size={buttonSize}
+                                                flex={1}
+                                            >
+                                                Cancelar
+                                            </MotionButton>
+                                        </HStack>
+                                    </VStack>
+
+                                ) : (
+                                    <HStack spacing={4} w="full" justifyContent="space-between">
                                         <MotionButton
                                             variant="outline"
-                                            onClick={onClose}
+                                            onClick={prevStep}
+                                            isDisabled={currentStep === 1}
                                             borderColor="gray.600"
                                             borderWidth="2px"
-                                            color="gray.400"
+                                            color="white"
                                             bg="transparent"
                                             _hover={{
-                                                color: 'white',
-                                                borderColor: 'gray.400',
-                                                bg: 'gray.800'
+                                                borderColor: currentStep === 1 ? 'gray.600' : 'red.400',
+                                                color: currentStep === 1 ? 'gray.500' : 'red.400',
+                                                bg: currentStep === 1 ? 'transparent' : 'red.900'
                                             }}
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
+                                            _disabled={{
+                                                opacity: 0.4,
+                                                cursor: 'not-allowed'
+                                            }}
+                                            whileHover={{ scale: currentStep === 1 ? 1 : 1.05 }}
+                                            whileTap={{ scale: currentStep === 1 ? 1 : 0.95 }}
                                             size="lg"
                                         >
-                                            Cancelar
+                                            Anterior
                                         </MotionButton>
 
-                                        {currentStep < 2 ? (
+                                        <HStack spacing={3}>
                                             <MotionButton
-                                                bg="red.600"
-                                                color="white"
-                                                onClick={nextStep}
-                                                _hover={{ bg: 'red.700' }}
+                                                variant="outline"
+                                                onClick={onClose}
+                                                borderColor="gray.600"
+                                                borderWidth="2px"
+                                                color="gray.400"
+                                                bg="transparent"
+                                                _hover={{
+                                                    color: 'white',
+                                                    borderColor: 'gray.400',
+                                                    bg: 'gray.800'
+                                                }}
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.95 }}
                                                 size="lg"
-                                                px={8}
-                                                boxShadow="0 0 20px rgba(220, 38, 38, 0.4)"
                                             >
-                                                Siguiente
+                                                Cancelar
                                             </MotionButton>
-                                        ) : (
-                                            <MotionButton
-                                                bg="red.600"
-                                                color="white"
-                                                onClick={handleSubmit}
-                                                isLoading={isSubmitting}
-                                                loadingText="Guardando..."
-                                                leftIcon={<Check size={20} />}
-                                                _hover={{ bg: 'red.700' }}
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                size="lg"
-                                                px={8}
-                                                boxShadow="0 0 25px rgba(220, 38, 38, 0.6)"
-                                            >
-                                                Guardar Vehículo
-                                            </MotionButton>
-                                        )}
+
+                                            {currentStep < 2 ? (
+                                                <MotionButton
+                                                    bg="red.600"
+                                                    color="white"
+                                                    onClick={nextStep}
+                                                    _hover={{ bg: 'red.700' }}
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    size="lg"
+                                                    px={8}
+                                                    boxShadow="0 0 20px rgba(220, 38, 38, 0.4)"
+                                                >
+                                                    Siguiente
+                                                </MotionButton>
+                                            ) : (
+                                                <MotionButton
+                                                    bg="red.600"
+                                                    color="white"
+                                                    onClick={handleSubmit}
+                                                    isLoading={isSubmitting}
+                                                    loadingText="Guardando..."
+                                                    leftIcon={<Check size={20} />}
+                                                    _hover={{ bg: 'red.700' }}
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    size="lg"
+                                                    px={8}
+                                                    boxShadow="0 0 25px rgba(220, 38, 38, 0.6)"
+                                                >
+                                                    Guardar Vehículo
+                                                </MotionButton>
+                                            )}
+                                        </HStack>
                                     </HStack>
-                                </HStack>
+                                )}
+
                             </ModalFooter>
                         </ModalContent>
                     </Modal>
