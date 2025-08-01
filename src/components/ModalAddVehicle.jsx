@@ -445,7 +445,7 @@ const ModalAddVehicle = ({ isOpen, onOpen, onClose }) => {
                         Imágenes del Vehículo
                     </Text>
                     <Text fontSize="sm" color="gray.400">
-                        Agrega hasta 5 imágenes del vehículo
+                        Agrega hasta 25 imágenes del vehículo
                     </Text>
                 </Box>
 
@@ -718,9 +718,8 @@ const ModalAddVehicle = ({ isOpen, onOpen, onClose }) => {
                                 p={{ base: 4, md: 6 }}
                             >
                                 {isMobile ? (
-                                    // Layout móvil
                                     <VStack spacing={4} w="full">
-                                        <HStack spacing={3} w="full" justifyContent="center">
+                                        <HStack spacing={3} w="full" justifyContent="center" color='whiteAlpha.900' >
                                             {currentStep < 2 ? (
                                                 <MotionButton
                                                     bg="red.600"
