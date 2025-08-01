@@ -63,6 +63,7 @@ export default function Carrousel() {
     const imageWidth = useBreakpointValue({ base: "280px", md: "350px", lg: "400px" });
     const imageHeight = useBreakpointValue({ base: "180px", md: "220px", lg: "250px" });
     const modalSize = useBreakpointValue({ base: "full", md: "4xl", lg: "6xl" });
+    const iconSize = useBreakpointValue({ base: 16, md: 18 });
     const gridColumns = useBreakpointValue({
         base: "repeat(1, 1fr)",
         md: "repeat(2, 1fr)",
@@ -510,10 +511,10 @@ export default function Carrousel() {
                             <Text as="span" color="whiteAlpha.900">Gratis!</Text>
                         </Heading>
                         <Text color="gray.400" textAlign="center" fontSize={textSize} mt={2}>
-                            Descubre nuestros vehículos disponibles para entrega inmediata.
-                        </Text>
-                        <Text color="gray.400" textAlign="center" fontSize={textSize} mt={2}>
-                            Más de 95 vehículos disponibles para entrega inmediata!!!
+                            100 vehículos disponibles para entrega inmediata!
+                            Encuentra el modelo que buscas y llévatelo hoy mismo.
+                            ¡Consulta ahora y estrena sin esperas!
+
                         </Text>
                         <Text
                             color="gray.400"
@@ -522,8 +523,28 @@ export default function Carrousel() {
                             mt={2}
                             px={{ base: 4, md: 0 }}
                         >
-                            No vendemos autos 🚘, ayudamos a alcanzar tus metas 🏎️🔥 🙏🏽🦾
+                            Aquí no solo compras un vehículo, comienzas un nuevo capítulo. ¡Tu sueño sobre ruedas empieza con nosotros!
                         </Text>
+                        <MotionButton
+                            as='a'
+                            variant="ghost"
+                            color="white"
+                            size={buttonSize}
+                            leftIcon={<Car size={iconSize} />}
+                            _hover={{
+                                bg: "rgba(239,68,68,0.1)",
+                                color: "red.400",
+                                transform: "translateY(-2px)"
+                            }}
+                            position="relative"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            href={'/catalog'}
+                            fontSize={{ base: 'sm', xl: 'md' }}
+                            mt={8}
+                        >
+                            Catalogo Completo
+                        </MotionButton>
                     </MotionBox>
                 </VStack>
 
@@ -590,7 +611,7 @@ export default function Carrousel() {
                                     >
                                         {currentCar.name} {currentCar.model} {currentCar.year}
                                     </Heading>
-                                    
+
                                     <HStack
                                         spacing={{ base: 4, md: 6 }}
                                         mb={6}

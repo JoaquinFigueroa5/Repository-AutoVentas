@@ -113,7 +113,7 @@ const ContactFooter = () => {
         {
             icon: FaMapMarkerAlt,
             label: 'Ubicación',
-            value: 'Zona 18, Carretera al atlantico km 10.5, Ciudad de Guatemala',
+            value: 'Zona 18, Carretera al Atlántico Km 10.5, Ciudad de Guatemala',
             action: '#'
         }
     ];
@@ -181,10 +181,14 @@ const ContactFooter = () => {
                                             bgClip="text"
                                             mb={4}
                                         >
-                                            Hablemos de tu financiamiento
+                                            ¿Necesitas financiamiento?
                                         </Text>
                                         <Text fontSize="lg" color="gray.300" maxW="md">
-                                            Estamos aqui para poder darte el mejor servicio y darte el auto de tus sueños.
+                                            ¡Te ayudamos a estrenar tu vehículo con planes accesibles y a tu medida!
+                                            Contamos con opciones de financiamiento flexibles
+                                            Aprobación rápida y cuotas que se ajustan a tu presupuesto.
+                                            El auto de tus sueños está más cerca de lo que imaginas.
+                                            Financiamiento fácil, sin complicaciones.
                                         </Text>
                                     </Box>
 

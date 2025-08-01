@@ -592,7 +592,11 @@ const ModalAddVehicle = ({ isOpen, onOpen, onClose }) => {
         <>
             <AnimatePresence>
                 {isOpen && (
-                    <Modal isOpen={isOpen} onClose={onClose} size="2xl" closeOnOverlayClick={false}>
+                    <Modal isOpen={isOpen} onClose={onClose} size="2xl" closeOnOverlayClick={false}
+
+    scrollBehavior="inside"
+    blockScrollOnMount={true}
+    preserveScrollBarGap={true}>
                         <ModalOverlay
                             bg="blackAlpha.800"
                             backdropFilter="blur(10px)"
