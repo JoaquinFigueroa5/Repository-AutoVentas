@@ -543,7 +543,7 @@ export default function Carrousel() {
                             fontSize={{ base: 'sm', xl: 'md' }}
                             mt={8}
                         >
-                            Catalogo Completo
+                            Presiona aqui para ver el catalogo completo
                         </MotionButton>
                     </MotionBox>
                 </VStack>
@@ -1056,10 +1056,6 @@ export default function Carrousel() {
                                                     <Text as='a' href='tel:30300738' fontSize="sm">
                                                         +502 3030-0738
                                                     </Text>
-                                                </HStack>
-                                                <HStack>
-                                                    <Mail size={18} color="#ef4444" />
-                                                    <Text fontSize="sm">ventas@premiumcars.com</Text>
                                                 </HStack>
                                                 <HStack>
                                                     <MapPin size={18} color="#ef4444" />

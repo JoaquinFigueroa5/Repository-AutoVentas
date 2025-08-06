@@ -105,12 +105,6 @@ const ContactFooter = () => {
             action: `https://wa.me/50230300738?text=${encodeURIComponent('Hola, vengo de la página web y quisiera cotizar...')}`
         },
         {
-            icon: FaEnvelope,
-            label: 'Email',
-            value: 'ventas@empresa.com',
-            action: 'mailto:ventas@empresa.com'
-        },
-        {
             icon: FaMapMarkerAlt,
             label: 'Ubicación',
             value: 'Zona 18, Carretera al Atlántico Km 10.5, Ciudad de Guatemala',

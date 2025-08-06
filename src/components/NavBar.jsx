@@ -355,10 +355,6 @@ export default function PremiumNavbar() {
                                         <Text fontSize="sm">+502 3030-0738</Text>
                                     </HStack>
                                     <HStack>
-                                        <Mail size={16} color="#ef4444" />
-                                        <Text fontSize="sm">info@correo.com</Text>
-                                    </HStack>
-                                    <HStack>
                                         <MapPin size={16} color="#ef4444" />
                                         <Text fontSize="sm">Zona 18, Carretera al atlantico km 10.5, Ciudad de Guatemala</Text>
                                     </HStack>

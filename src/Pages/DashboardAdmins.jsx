@@ -1396,10 +1396,6 @@ const AutoSalesDashboard = () => {
                                                                         </Text>
                                                                     </HStack>
                                                                     <HStack>
-                                                                        <Mail size={18} color="#ef4444" />
-                                                                        <Text fontSize="sm">ventas@premiumcars.com</Text>
-                                                                    </HStack>
-                                                                    <HStack>
                                                                         <MapPin size={18} color="#ef4444" />
                                                                         <Text fontSize="sm">Guatemala, Zona 18, km 10.5</Text>
                                                                     </HStack>
